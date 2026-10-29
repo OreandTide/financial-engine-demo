@@ -225,7 +225,7 @@ function sampleData() {
   }
   return {
     settings: { asOf: "2026-10-29", cushion: 200, paychecksPerYear: 26, cadence: "Monthly",
-                dark: false },
+                dark: false, stsHalfNext: false },
     accounts: [
       { id: uid(), name: "Everyday Checking", balance: 625.40, counts: true },
       { id: uid(), name: "Bills Checking", balance: 1824.60, counts: true },
@@ -295,6 +295,14 @@ function nextPayday() {
     .sort((a, b) => a.date < b.date ? -1 : 1);
   return any.length ? any[0].date : addDays(S.settings.asOf, 14);
 }
+function nextPaydayAfter(date) {
+  const fut = S.paychecks.filter(p => !p.received && p.date > date)
+    .sort((a, b) => a.date < b.date ? -1 : 1);
+  if (fut.length) return fut[0].date;
+  const any = S.paychecks.filter(p => p.date > date)
+    .sort((a, b) => a.date < b.date ? -1 : 1);
+  return any.length ? any[0].date : null;
+}
 function engine() {
   const asOf = S.settings.asOf, payday = nextPayday();
   const days = Math.max(1, daysBetween(asOf, payday));
@@ -305,14 +313,21 @@ function engine() {
   const dueBills = S.settings.stsMonthWindow
     ? S.bills.filter(b => !b.paid && b.due >= monthStart && b.due <= monthEnd)
     : S.bills.filter(b => !b.paid && b.due >= asOf && b.due < payday);
-  const billsDue = dueBills.reduce((t, b) => t + (+b.amount || 0), 0);
+  const classicDue = dueBills.reduce((t, b) => t + (+b.amount || 0), 0);
+  const paydayAfterNext = nextPaydayAfter(payday) || addDays(payday, days);
+  let halfNext = 0;
+  if (S.settings.stsHalfNext && !S.settings.stsMonthWindow) {
+    halfNext = 0.5 * S.bills.filter(b => !b.paid && b.due >= payday && b.due < paydayAfterNext)
+      .reduce((t, b) => t + (+b.amount || 0), 0);
+  }
+  const billsDue = classicDue + halfNext;
   const protectedDue = S.future.filter(f => f.due >= asOf && f.due < payday)
     .reduce((t, f) => t + Math.max(0, (+f.target || 0) - (+f.saved || 0)), 0);
   const sts = eligible - billsDue - protectedDue - (+S.settings.cushion || 0);
   const flex7 = S.transactions.filter(t => t.dir === "Out" && t.kind === "Flexible" &&
     t.date >= addDays(asOf, -6) && t.date <= asOf)
     .reduce((t, x) => t + (+x.amount || 0), 0);
-  return { asOf, payday, days, eligible, dueBills, billsDue, protectedDue,
+  return { asOf, payday, paydayAfterNext, days, eligible, dueBills, billsDue, halfNext, protectedDue,
            sts, perDay: sts > 0 ? sts / days : 0,
            shortfall: Math.max(0, -sts), flex7, flexAvg: flex7 / 7,
            onPace: sts <= 0 ? false : (flex7 / 7) <= (sts / days) };
@@ -416,7 +431,7 @@ function aiSummary() {
   }).join("; ");
   return `Here is my money snapshot from the Ore & Tide Financial Engine, as of ${e.asOf}. Please work only from these figures.
 
-SAFE TO SPEND: ${money(Math.max(0, e.sts))} — ${money(e.perDay)} per day for ${e.days} days, until payday ${e.payday}. Eligible cash ${money(e.eligible)}; bills reserved ${money(e.billsDue)}; protected ${money(e.protectedDue)}; cushion ${money(+S.settings.cushion || 0)}.
+SAFE TO SPEND: ${money(Math.max(0, e.sts))} — ${money(e.perDay)} per day for ${e.days} days, until payday ${e.payday}. Eligible cash ${money(e.eligible)}; bills reserved ${money(e.billsDue)}${e.halfNext > 0 ? ` (includes ${money(e.halfNext)} held as half of next cycle's bills)` : ""}; protected ${money(e.protectedDue)}; cushion ${money(+S.settings.cushion || 0)}.
 NET WORTH: ${nw.net < 0 ? "−" : ""}${money(Math.abs(nw.net)).slice(0)} (accounts ${money(nw.assets)} minus debts ${money(nw.debtTotal)}).
 DEBTS: ${debts}.
 BILLS DUE BEFORE PAYDAY: ${bills}.
@@ -1167,7 +1182,7 @@ function vInsights() {
           e.onPace ? "on pace — flexible spending is within your daily amount." :
           "running hot — flexible spending is above your daily amount."}</li>
         ${nextBill ? `<li>Next bill: <b>${esc(nextBill.name)}</b> ${money(nextBill.amount)} on ${esc(nextBill.due)}.</li>` : ""}
-        <li>${e.dueBills.length} bill(s) totaling ${money(e.billsDue)} are reserved before payday (${esc(e.payday)}).</li>
+        <li>${e.dueBills.length} bill(s) totaling ${money(e.billsDue - e.halfNext)} are reserved before payday (${esc(e.payday)})${e.halfNext > 0 ? `, plus ${money(e.halfNext)} held as half of next cycle's bills` : ""}.</li>
       </ul></div>
   </div>
   <div class="card" style="margin-top:16px"><h3>Categories over budget this month</h3>
@@ -1238,6 +1253,7 @@ function vHelp() {
       <li><b>Runway</b> — every account projected 30 days forward, paychecks landing and bills drafting on their dates, with each account's lowest point flagged before it happens.</li>
       <li><b>Budget pace</b> — each category shows what you'd expect to have spent by today, so a category can be inside its budget and still ahead of pace.</li>
       <li><b>Stricter Safe to Spend</b> — Settings offers a whole-month reserve: every unpaid bill due this calendar month held back, not just the ones before payday.</li>
+      <li><b>Half of next cycle, held early</b> — Settings can also hold back half of the following cycle's bills on top of the standard reserve, so a heavy cycle never lands on one paycheck.</li>
       <li><b>Ask AI</b> — one tap takes a short written summary of your numbers to your own ChatGPT or Claude account. Nothing is uploaded; the summary opens pre-typed in your AI, and you press send. Ore &amp; Tide never sees it.</li>
       <li><b>Search</b> — the Transactions page filters as you type: a category, a word, or a month like 2026-10.</li>
     </ul>
@@ -1263,6 +1279,9 @@ function vSettings() {
       <label class="small" style="flex-basis:100%"><input type="checkbox" name="stsMonth" ${S.settings.stsMonthWindow ? "checked" : ""}>
         <b>Reserve the whole month in Safe to Spend.</b> Standard: only bills due before payday are reserved.
         Turn this on and every unpaid bill due this calendar month is reserved instead — stricter, and the number drops.</label>
+      <label class="small" style="flex-basis:100%"><input type="checkbox" name="stsHalfNext" ${S.settings.stsHalfNext ? "checked" : ""}>
+        <b>Reserve half of next cycle's bills too.</b> Standard reserves only bills due before payday.
+        Turn this on and half of the following cycle's bills are held back as well, so a heavy cycle never lands on one paycheck.</label>
     </form>
     <div class="hr"></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -1426,6 +1445,7 @@ function wire() {
     S.settings.cushion = +f.cushion || 0;
     S.settings.paychecksPerYear = Math.max(1, +f.ppy || 26);
     S.settings.stsMonthWindow = f.stsMonth === "on";
+    S.settings.stsHalfNext = f.stsHalfNext === "on";
     save(); render(); });
   on("useToday", "click", () => { S.settings.asOf = todayISO(); save(); render(); });
   on("printBtn", "click", () => window.print());
