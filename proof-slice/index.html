@@ -83,6 +83,16 @@
     .banner.collapsed > :not(.minbar):not(.cardbtn) { display: none; }
     .destcard.collapsed > :not(.minbar):not(.cardbtn):not(.bar) { display: none; }
     .destcard.collapsed .bar { margin: 8px 0 2px; }
+    .ffbar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; justify-content: center;
+             max-width: 430px; margin: 12px auto 0; }
+    .fflabel { font-size: 10.5px; letter-spacing: .18em; font-weight: 700; color: #d4a857;
+               text-transform: uppercase; margin-right: 2px; }
+    .ffbar button { cursor: pointer; border: 1px solid rgba(255,255,255,.14); border-radius: 999px;
+                    background: rgba(8,24,44,.92); color: #a9c2d8;
+                    font: 600 12px Inter, system-ui, sans-serif; padding: 6px 12px; }
+    .ffbar button.on { background: #d4a857; color: #0b2d4f; border-color: #d4a857; }
+    .cdot { width: 5px; height: 5px; border-radius: 50%; background: rgba(212,168,87,.5); }
+    .cdot.sub { background: rgba(59,160,138,.55); }
     /* Real phones: the wide-layout cards wrapped until they ate the whole
        map. Compact the cards, give the frame the full screen height, and
        hard-cap card heights so a map band always survives. */
@@ -109,7 +119,7 @@
       .readout { font-size: 10px; }
     }
   </style>
-  <script type="module" crossorigin src="./assets/roadmap-proof-slice-aKS5x_8J.js"></script>
+  <script type="module" crossorigin src="./assets/roadmap-proof-slice-wwJqeeBa.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/roadmap-proof-slice-B8-mEBLf.css">
 </head>
 <body><div id="root"></div></body>
