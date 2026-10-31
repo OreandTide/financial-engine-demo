@@ -70,6 +70,19 @@
     .altline { margin-top: 9px; font-size: 11.5px; line-height: 1.5; color: #a9c2d8; }
     .altline b { color: #f0d9a8; font-weight: 600; }
     .maplibregl-ctrl-attrib { font-size: 9px; }
+    /* Minimizable panels: a slim summary bar stays, the rest folds away
+       so the map can have the screen. The camera measures card heights,
+       so it re-frames on its own when a panel folds. */
+    .cardbtn { position: absolute; top: 8px; right: 8px; z-index: 2; width: 26px; height: 26px;
+               border-radius: 50%; border: 1px solid rgba(255,255,255,.18); cursor: pointer;
+               background: rgba(38,68,102,.85); color: #dcebf7; font-size: 13px; line-height: 1;
+               display: flex; align-items: center; justify-content: center; }
+    .minbar { display: none; font-size: 12.5px; font-weight: 600; color: #dcebf7; padding-right: 30px; }
+    .banner.collapsed, .destcard.collapsed { padding-top: 10px; padding-bottom: 10px; }
+    .collapsed .minbar { display: block; }
+    .banner.collapsed > :not(.minbar):not(.cardbtn) { display: none; }
+    .destcard.collapsed > :not(.minbar):not(.cardbtn):not(.bar) { display: none; }
+    .destcard.collapsed .bar { margin: 8px 0 2px; }
     /* Real phones: the wide-layout cards wrapped until they ate the whole
        map. Compact the cards, give the frame the full screen height, and
        hard-cap card heights so a map band always survives. */
@@ -96,7 +109,7 @@
       .readout { font-size: 10px; }
     }
   </style>
-  <script type="module" crossorigin src="./assets/roadmap-proof-slice-BBStGZi2.js"></script>
+  <script type="module" crossorigin src="./assets/roadmap-proof-slice-aKS5x_8J.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/roadmap-proof-slice-B8-mEBLf.css">
 </head>
 <body><div id="root"></div></body>
