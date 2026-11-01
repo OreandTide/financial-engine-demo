@@ -63,6 +63,24 @@
     .guideline:first-of-type { color: #dcebf7; }
     .reroute { margin-top: 9px; border-left: 3px solid #f59e0b; background: rgba(245,158,11,.10);
                padding: 7px 10px; border-radius: 0 8px 8px 0; font-size: 12.5px; color: #f5cf8f; }
+    /* Reroute lifecycle: accept -> in progress -> verdict. The accent
+       shifts with the state — amber offer, gold in-progress, green active. */
+    .rrteach { margin-top: 5px; font-size: 11.5px; line-height: 1.45; color: #a9c2d8; }
+    .rrnote { margin-top: 6px; font-size: 11.5px; line-height: 1.45; color: #a9c2d8; }
+    .rrbtn { margin-top: 8px; cursor: pointer; border: 1px solid #d4a857; border-radius: 999px;
+             background: #d4a857; color: #0b2d4f; font: 700 12px Inter, system-ui, sans-serif;
+             padding: 6px 13px; }
+    .rrbtn:hover { background: #e3ba68; }
+    .reroute.accepted { border-left-color: #d4a857; background: rgba(212,168,87,.12); color: #f0d9a8; }
+    .reroute.active { border-left-color: #2e7d5b; background: rgba(46,125,91,.16); color: #bfe6d2; }
+    .verdictwrap { position: absolute; inset: 0; z-index: 20; display: flex;
+                   align-items: center; justify-content: center; padding: 18px;
+                   background: rgba(4,12,24,.55); }
+    .verdict { max-width: 330px; background: #0a1f38; border: 1px solid rgba(212,168,87,.45);
+               border-radius: 14px; padding: 16px 18px; box-shadow: 0 10px 34px rgba(0,0,0,.55);
+               color: #dcebf7; }
+    .vtitle { font-family: Lora, Georgia, serif; font-size: 17.5px; line-height: 1.3; color: #f3e9d7; }
+    .verdict p { margin: 9px 0 2px; font-size: 13px; line-height: 1.55; color: #a9c2d8; }
     .spill.sub { border-color: #3ba08a; }
     .subtag { font-style: normal; font-size: 8.5px; font-weight: 800; letter-spacing: .08em;
               color: #0c2438; background: #3ba08a; border-radius: 4px; padding: 1.5px 4px; margin-right: 5px; }
@@ -136,7 +154,7 @@
       .readout { font-size: 10px; }
     }
   </style>
-  <script type="module" crossorigin src="./assets/roadmap-proof-slice-CL4cN0cq.js"></script>
+  <script type="module" crossorigin src="./assets/roadmap-proof-slice-D7OUPK-F.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/roadmap-proof-slice-B8-mEBLf.css">
 </head>
 <body><div id="root"></div></body>
