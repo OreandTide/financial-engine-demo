@@ -73,6 +73,27 @@
     .rrbtn:hover { background: #e3ba68; }
     .reroute.accepted { border-left-color: #d4a857; background: rgba(212,168,87,.12); color: #f0d9a8; }
     .reroute.active { border-left-color: #2e7d5b; background: rgba(46,125,91,.16); color: #bfe6d2; }
+    /* GPS announcements: a stack under the banner, visible by default.
+       Traffic red, slips amber, recovery/arrival green, reroutes gold. */
+    .notices { position: absolute; left: 12px; right: 12px; top: 64px; z-index: 6;
+               display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+    .notice { background: rgba(8,24,44,.94); border: 1px solid rgba(255,255,255,.14);
+              border-left: 3px solid #d4a857; border-radius: 10px; padding: 8px 11px;
+              font-size: 12.5px; line-height: 1.45; color: #dcebf7;
+              box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+    .notice.traffic { border-left-color: #ef4444; }
+    .notice.slip { border-left-color: #f59e0b; }
+    .notice.recovery, .notice.rerouteok { border-left-color: #2e7d5b; }
+    .notice.arrived { border-left-color: #2e7d5b; background: rgba(14,42,30,.95); font-weight: 600; }
+    button.notice.rroffer { pointer-events: auto; cursor: pointer; text-align: left; width: 100%;
+              font: 500 12.5px Inter, system-ui, sans-serif; }
+    /* Arrival brief: the trip summary card, above the destination card. */
+    .brief { position: absolute; left: 12px; right: 12px; bottom: 170px; z-index: 7;
+             background: rgba(8,24,44,.96); border: 1px solid rgba(212,168,87,.5);
+             border-radius: 14px; padding: 13px 15px; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+    .brief-title { font-family: Lora, Georgia, 'Times New Roman', serif; font-size: 16.5px;
+                   color: #f3e9d7; margin-bottom: 6px; }
+    .brief-line { font-size: 12.5px; line-height: 1.55; color: #c8d9e8; }
     .verdictwrap { position: absolute; inset: 0; z-index: 20; display: flex;
                    align-items: center; justify-content: center; padding: 18px;
                    background: rgba(4,12,24,.55); }
@@ -160,9 +181,12 @@
       .altline { font-size: 11px; line-height: 1.45; display: -webkit-box;
                  -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
       .readout { font-size: 10px; }
+      .notice { font-size: 11.5px; padding: 7px 9px; }
+      button.notice.rroffer { font-size: 11.5px; }
+      .brief-line { font-size: 11.5px; }
     }
   </style>
-  <script type="module" crossorigin src="./assets/roadmap-proof-slice-BUhQl1qS.js"></script>
+  <script type="module" crossorigin src="./assets/roadmap-proof-slice-rmlMblQt.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/roadmap-proof-slice-B8-mEBLf.css">
 </head>
 <body><div id="root"></div></body>
