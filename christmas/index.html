@@ -501,7 +501,8 @@ function computeStats(S){
   const perPerson=(S.people||[]).map(p=>{
     const mine=gifts.filter(g=>g.who===p.name);
     const sp=r2(mine.filter(g=>g.status!=="Idea").reduce((a,g)=>a+(+g.act||0),0));
-    return{name:p.name,rel:p.rel,cap:+p.cap||0,count:mine.length,spent:sp,over:sp>(+p.cap||0)};
+    const capN=+p.cap||0, hasCap=capN>0;
+    return{name:p.name,rel:p.rel,cap:capN,hasCap:hasCap,count:mine.length,spent:sp,over:hasCap&&sp>capN};
   });
   const exB=r2((S.extras||[]).reduce((a,e)=>a+(+e.bud||0),0));
   const exS=r2((S.extras||[]).reduce((a,e)=>a+(+e.act||0),0));
@@ -570,7 +571,7 @@ function openModal(title,bodyHTML,onSave){
     "<button type='submit' class='btn green grow'>Save</button></div></form>";
   $("modalWrap").classList.add("on"); modalSave=onSave;
   $("mCancel").onclick=closeModal;
-  $("mForm").onsubmit=e=>{e.preventDefault(); const fd=new FormData(e.target); if(modalSave) modalSave(fd); closeModal();};
+  $("mForm").onsubmit=e=>{e.preventDefault(); const fd=new FormData(e.target); if(modalSave&&modalSave(fd)===false) return; closeModal();};
   const f=$("modalBox").querySelector("input,select,textarea"); if(f) f.focus();
 }
 function openSheet(title,bodyHTML){
@@ -614,7 +615,7 @@ function personForm(p){
     "<div class='frow'>"+F("Relationship","rel",p.rel)+F("Budget cap $","cap",p.cap,"number","step='0.01' min='0' inputmode='decimal'")+"</div>"+
     FArea("Interests / likes (feeds Ask AI gift ideas)","interests",p.interests),
     fd=>{
-      const name=String(fd.get("name")||"").trim(); if(!name){toast("A name is required");return}
+      const name=String(fd.get("name")||"").trim(); if(!name){toast("A name is required");return false}
       const obj={name:name,rel:String(fd.get("rel")||"").trim(),cap:numOr(fd,"cap",0),interests:String(fd.get("interests")||"").trim()};
       if(p.name){ const i=S.people.indexOf(p); S.people[i]=obj;
         if(p.name!==name){ S.gifts.forEach(g=>{if(g.who===p.name)g.who=name}); S.ideas.forEach(x=>{if(x.who===p.name)x.who=name}); }
@@ -637,7 +638,7 @@ function giftForm(g){
     FArea("Notes","notes",g.notes),
     fd=>{
       const who=String(fd.get("who")||"").trim(), idea=String(fd.get("idea")||"").trim();
-      if(!who||!idea){toast("Person and gift idea are required");return}
+      if(!who||!idea){toast("Person and gift idea are required");return false}
       const obj={who:who,idea:idea,cat:fd.get("cat"),store:String(fd.get("store")||"").trim(),
         link:String(fd.get("link")||"").trim(),bud:numOr(fd,"bud",0),act:numNull(fd,"act"),
         status:fd.get("status"),hidden:!!fd.get("hidden"),delivery:fd.get("delivery"),
@@ -654,7 +655,7 @@ function ideaForm(x){
     "<div class='frow'>"+F("Link / where","link",x.link)+F("Rough price $","price",x.price,"number","step='0.01' min='0' inputmode='decimal'")+"</div>"+
     FArea("Notes","notes",x.notes),
     fd=>{
-      const idea=String(fd.get("idea")||"").trim(); if(!idea){toast("An idea is required");return}
+      const idea=String(fd.get("idea")||"").trim(); if(!idea){toast("An idea is required");return false}
       const obj={who:String(fd.get("who")||"").trim(),idea:idea,link:String(fd.get("link")||"").trim(),
         price:numNull(fd,"price"),notes:String(fd.get("notes")||"").trim(),promoted:!!x.promoted};
       if(isNew) S.ideas.push(obj); else S.ideas[S.ideas.indexOf(x)]=obj;
@@ -670,7 +671,7 @@ function extraForm(e){
     F("Spent $","act",e.act,"number","step='0.01' min='0' inputmode='decimal' placeholder='—'")+"</div>"+
     FArea("Notes","notes",e.notes),
     fd=>{
-      const item=String(fd.get("item")||"").trim(); if(!item){toast("Give it a name");return}
+      const item=String(fd.get("item")||"").trim(); if(!item){toast("Give it a name");return false}
       const obj={cat:fd.get("cat"),item:item,bud:numOr(fd,"bud",0),act:numNull(fd,"act"),notes:String(fd.get("notes")||"").trim()};
       if(isNew) S.extras.push(obj); else S.extras[S.extras.indexOf(e)]=obj;
       save(); render(); toast("Saved 🦃");
@@ -684,7 +685,7 @@ function cardForm(c){
     F("Postage $","postage",c.postage,"number","step='0.01' min='0' inputmode='decimal' placeholder='—'")+
     FCheck("Card sent","sent",c.sent)+FCheck("Gift goes by mail","byMail",c.byMail)+FCheck("Mailed","mailed",c.mailed),
     fd=>{
-      const name=String(fd.get("name")||"").trim(); if(!name){toast("A name is required");return}
+      const name=String(fd.get("name")||"").trim(); if(!name){toast("A name is required");return false}
       const obj={name:name,address:String(fd.get("address")||"").trim(),sent:!!fd.get("sent"),
         byMail:!!fd.get("byMail"),mailed:!!fd.get("mailed"),postage:numNull(fd,"postage")};
       if(isNew) S.cards.push(obj); else S.cards[S.cards.indexOf(c)]=obj;
@@ -702,7 +703,7 @@ function dealForm(d){
     F("Sale ends","ends",d.ends,"date")+"</div>"+
     FCheck("Bought it","bought",d.bought),
     fd=>{
-      const item=String(fd.get("item")||"").trim(); if(!item){toast("An item is required");return}
+      const item=String(fd.get("item")||"").trim(); if(!item){toast("An item is required");return false}
       const obj={item:item,who:String(fd.get("who")||"").trim(),reg:numOr(fd,"reg",0),target:numOr(fd,"target",0),
         best:numNull(fd,"best"),where:String(fd.get("where")||"").trim(),ends:fd.get("ends")||"",bought:!!fd.get("bought")};
       if(isNew) S.deals.push(obj); else S.deals[S.deals.indexOf(d)]=obj;
@@ -718,7 +719,7 @@ function returnForm(r){
     "<div class='frow'>"+F("Refund $","refund",r.refund,"number","step='0.01' min='0' inputmode='decimal' placeholder='—'")+
     "<div>"+FCheck("Receipt kept","receipt",r.receipt)+"</div></div>",
     fd=>{
-      const item=String(fd.get("item")||"").trim(); if(!item){toast("An item is required");return}
+      const item=String(fd.get("item")||"").trim(); if(!item){toast("An item is required");return false}
       const obj={item:item,store:String(fd.get("store")||"").trim(),bought:fd.get("bought")||"",
         deadline:fd.get("deadline")||"",receipt:!!fd.get("receipt"),status:fd.get("status"),refund:numNull(fd,"refund")};
       if(isNew) S.returns.push(obj); else S.returns[S.returns.indexOf(r)]=obj;
@@ -759,7 +760,10 @@ function renderHome(st,days){
   $("hProgress").innerHTML= prow("Bought",st.pctBought,"")+prow("Wrapped",st.pctWrapped,"g")+prow("Given / sent",st.pctGiven,"gold");
   $("hProgressNote").textContent= st.boughtCount+" of "+st.total+" gifts bought · "+st.ideasLeft+" still ideas";
   $("hPeople").innerHTML= st.perPerson.length? st.perPerson.map((p,i)=>{
-      const w=p.cap>0?Math.min(100,Math.round(p.spent/p.cap*100)):0;
+      if(!p.hasCap) return "<div style='margin:9px 0'><div class='rowline'><b style='color:var(--navy)'>"+esc(p.name)+"</b>"+
+        "<span class='grow'></span>"+
+        "<span class='small'><span class='money'>"+money(p.spent)+"</span> <span class='mut'>spent · no cap set</span></span></div></div>";
+      const w=Math.min(100,Math.round(p.spent/p.cap*100));
       return "<div style='margin:9px 0'><div class='rowline'><b style='color:var(--navy)'>"+esc(p.name)+"</b>"+
         (p.over?" <span class='chip over'>⚠ OVER CAP</span>":"")+"<span class='grow'></span>"+
         "<span class='small'><span class='money"+(p.over?" neg":"")+"'>"+money(p.spent)+"</span> <span class='mut'>of "+money(p.cap)+"</span></span></div>"+
@@ -850,14 +854,18 @@ function renderPeople(st){
   const byName={}; st.perPerson.forEach(p=>byName[p.name]=p);
   $("peopleList").innerHTML= S.people.length? S.people.map((p,i)=>{
     const s=byName[p.name]||{spent:0,count:0,over:false};
-    const left=r2(p.cap-s.spent), w=p.cap>0?Math.min(100,Math.round(s.spent/p.cap*100)):0;
+    const capN=+p.cap||0, hasCap=capN>0;
+    const left=r2(capN-s.spent), w=hasCap?Math.min(100,Math.round(s.spent/capN*100)):0;
     return "<div class='item'><div class='rowline'><span class='t' style='font-size:16px'>"+esc(p.name)+"</span>"+
       (p.rel?" <span class='mut small'>"+esc(p.rel)+"</span>":"")+"<span class='grow'></span>"+
       (s.over?"<span class='chip over'>⚠ OVER CAP</span>":"")+"</div>"+
       (p.interests?"<div class='meta'>Likes: "+esc(p.interests)+"</div>":"")+
-      "<div class='pbar'><i class='"+(s.over?"r":"g")+"' style='width:"+w+"%'></i></div>"+
-      "<div class='rowline'><span class='small'><span class='money"+(s.over?" neg":"")+"'>"+money(s.spent)+"</span> spent of <button type='button' class='cap-edit' data-act='edit-cap' data-i='"+i+"' title='Tap to change this cap'>"+money(p.cap)+"</button> cap · "+s.count+" gift"+(s.count===1?"":"s")+"</span><span class='grow'></span>"+
-      "<span class='small mut'>"+(s.over?money(-left)+" over":money(left)+" of cap left")+"</span></div>"+
+      (hasCap?"<div class='pbar'><i class='"+(s.over?"r":"g")+"' style='width:"+w+"%'></i></div>":"")+
+      (hasCap?
+      "<div class='rowline'><span class='small'><span class='money"+(s.over?" neg":"")+"'>"+money(s.spent)+"</span> spent of <button type='button' class='cap-edit' data-act='edit-cap' data-i='"+i+"' title='Tap to change this cap'>"+money(capN)+"</button> cap · "+s.count+" gift"+(s.count===1?"":"s")+"</span><span class='grow'></span>"+
+      "<span class='small mut'>"+(s.over?money(-left)+" over":money(left)+" of cap left")+"</span></div>"
+      :
+      "<div class='rowline'><span class='small'><span class='money'>"+money(s.spent)+"</span> spent · <button type='button' class='cap-edit' data-act='edit-cap' data-i='"+i+"' title='Tap to set a cap'>No cap set — tap to add one</button> · "+s.count+" gift"+(s.count===1?"":"s")+"</span><span class='grow'></span></div>")+
       "<div class='rowline' style='margin-top:8px'>"+aiBtn("ask-person",i,"Ask AI for gift ideas")+
       "<button class='iconbtn' data-act='edit-person' data-i='"+i+"'>Edit</button>"+
       "<button class='iconbtn danger' data-act='del-person' data-i='"+i+"'>✕</button></div></div>";
@@ -946,15 +954,18 @@ function askPerson(i){
   const bought=S.gifts.filter(g=>g.who===p.name&&g.status!=="Idea").map(g=>g.idea);
   const planned=S.gifts.filter(g=>g.who===p.name&&g.status==="Idea").map(g=>g.idea);
   const banked=S.ideas.filter(x=>x.who===p.name&&!x.promoted).map(x=>x.idea);
-  const left=r2(p.cap-mine.spent);
+  const capN=+p.cap||0, hasCap=capN>0, left=r2(capN-mine.spent);
   askSheet("Gift ideas for "+p.name,
     "I'm Christmas shopping for "+p.name+" (my "+(p.rel||"family")+") and I need gift ideas.\n"+
     (p.interests?"They're into: "+p.interests+".\n":"")+
-    "Their gift budget cap is "+money(p.cap)+"; I've spent "+money(mine.spent)+" so far, so I have about "+money(left)+" left for them.\n"+
+    (hasCap?
+      "Their gift budget cap is "+money(capN)+"; I've spent "+money(mine.spent)+" so far, so I have about "+money(left)+" left for them.\n"
+      :
+      "I haven't set a budget cap for them; I've spent "+money(mine.spent)+" on them so far.\n")+
     (bought.length?"Already bought: "+bought.join(", ")+".\n":"")+
     (planned.length?"Already planned (not bought yet): "+planned.join(", ")+".\n":"")+
     (banked.length?"Ideas I've already parked: "+banked.join(", ")+".\n":"")+
-    "Please suggest 6 fresh gift ideas within the remaining budget — a mix of safe picks and one or two surprises — with a rough price for each and where people usually find them. Nothing that duplicates what's already bought or planned.");
+    "Please suggest 6 fresh gift ideas "+(hasCap?"within the remaining budget":"at sensible everyday prices")+" — a mix of safe picks and one or two surprises — with a rough price for each and where people usually find them. Nothing that duplicates what's already bought or planned.");
 }
 function askGift(i){
   const g=S.gifts[i]; if(!g) return;
@@ -978,7 +989,7 @@ function askIdea(i){
 function askBudget(){
   const st=computeStats(S);
   const overs=st.perPerson.filter(p=>p.over);
-  const lines=st.perPerson.map(p=>"· "+p.name+": "+money(p.spent)+" of "+money(p.cap)+" cap").join("\n");
+  const lines=st.perPerson.map(p=>p.hasCap?("· "+p.name+": "+money(p.spent)+" of "+money(p.cap)+" cap"):("· "+p.name+": "+money(p.spent)+" spent (no cap set)")).join("\n");
   askSheet("Sanity-check my Christmas budget",
     "Please sanity-check my Christmas gift budget and tell me plainly where to trim or rebalance.\n"+
     "Total gift budget: "+money(st.budget)+". Spent so far: "+money(st.spent)+". Left: "+money(st.remaining)+".\n"+
@@ -1108,7 +1119,13 @@ document.addEventListener("click",e=>{
   if(act==="goto") show(b.dataset.to);
   else if(act==="add-person") personForm(null);
   else if(act==="edit-person") personForm(S.people[i]);
-  else if(act==="del-person") delConfirm("this person",()=>{S.people.splice(i,1);save();render();toast("Deleted")});
+  else if(act==="del-person"){ const p=S.people[i], mine=S.gifts.filter(g=>g.who===p.name),
+      pSpent=r2(mine.filter(g=>g.status!=="Idea").reduce((a,g)=>a+(+g.act||0),0)),
+      doDel=()=>{S.people.splice(i,1);save();render();toast("Deleted")};
+    if(mine.length) confirmSheet("Delete "+p.name+"?",
+      p.name+" has "+mine.length+" gift"+(mine.length===1?"":"s")+" on your list ("+money(pSpent)+" spent) — they'll stay on your gift list and in your totals if you remove "+p.name+" from People. There's no undo (a backup export is the safety net).",
+      "Delete",doDel);
+    else delConfirm("this person",doDel); }
   else if(act==="add-gift") giftForm(null);
   else if(act==="edit-gift") giftForm(S.gifts[i]);
   else if(act==="del-gift") delConfirm("this gift",()=>{S.gifts.splice(i,1);save();render();toast("Deleted")});
