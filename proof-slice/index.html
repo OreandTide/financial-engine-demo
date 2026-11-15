@@ -94,6 +94,27 @@
     .brief-title { font-family: Lora, Georgia, 'Times New Roman', serif; font-size: 16.5px;
                    color: #f3e9d7; margin-bottom: 6px; }
     .brief-line { font-size: 12.5px; line-height: 1.55; color: #c8d9e8; }
+    /* Stop detail card (Nov 15 2026): opened by tapping a stop's
+       line; it names the ONE stop that was tapped — a merged
+       bubble never blurs which stop you opened. Sits where the
+       arrival brief sits, above the destination card. */
+    .stopcard { position: absolute; left: 12px; right: 12px; bottom: 170px; z-index: 8;
+                background: rgba(8,24,44,.96); border: 1px solid rgba(212,168,87,.5);
+                border-radius: 14px; padding: 13px 15px; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+    /* Tappable stop bubbles (Nov 15 2026): single pills are
+       buttons; same-day stops merge into one bubble of bulleted
+       lines (the merging rule), each line its own button. */
+    button.spill { font: inherit; cursor: pointer; text-align: left; }
+    .spill.merged { flex-direction: column; align-items: stretch; gap: 1px;
+                    border-radius: 14px; padding: 5px 7px; }
+    .sline { display: flex; gap: 6px; align-items: baseline; white-space: nowrap;
+             background: none; border: 0; color: #eef4fa; font: inherit;
+             cursor: pointer; padding: 2px 3px; border-radius: 7px; text-align: left; }
+    .sline::before { content: "•"; color: #d4a857; font-weight: 700; }
+    .sline b { font-weight: 700; }
+    .sline span { color: #d4a857; font-weight: 700; }
+    .smore { background: none; border: 0; color: #a9c2d8; font: inherit; font-size: 10.5px;
+             cursor: pointer; padding: 2px 3px; text-align: left; }
     .verdictwrap { position: absolute; inset: 0; z-index: 20; display: flex;
                    align-items: center; justify-content: center; padding: 18px;
                    background: rgba(4,12,24,.55); }
@@ -188,7 +209,7 @@
       .brief-line { font-size: 11.5px; }
     }
   </style>
-  <script type="module" crossorigin src="./assets/roadmap-proof-slice-smsG1X8E.js"></script>
+  <script type="module" crossorigin src="./assets/roadmap-proof-slice-f4yvjS1B.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/roadmap-proof-slice-B8-mEBLf.css">
 </head>
 <body><div id="root"></div></body>
