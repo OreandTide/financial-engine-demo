@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Subscription &amp; Bill Audit Tracker — Ore &amp; Tide</title>
+<meta name="description" content="A 20-minute audit of every recurring charge you own. Works offline, no account. Your data lives on your device.">
+<style>
+:root{
+  --navy:#0F2D4A; --ocean:#1E5D7A; --teal:#3E8CA7; --gold:#D4AF7A;
+  --mist:#E6F1F6; --stone:#F5F7F9; --slate:#64748B;
+  --ink:#14232E; --ink2:#5B7183; --line:#D5E0E7; --card:#FFFFFF;
+  --deep:#081E33; --red:#B3402A; --green:#1E7B45; --amber:#9A6B14;
+  --shadow:0 2px 10px rgba(8,30,51,.10);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;
+  background:linear-gradient(180deg,#F2F8FA 0%,var(--mist) 340px,#DCE9F0 100%);
+  min-height:100vh;padding-bottom:86px}
+h1,h2,h3,.serif{font-family:Georgia,"Times New Roman",serif}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;font-size:16px;color:var(--ink)}
+header.top{position:sticky;top:0;z-index:40;color:#fff;
+  background:linear-gradient(120deg,var(--deep) 0%,var(--navy) 55%,var(--ocean) 130%);
+  box-shadow:0 2px 12px rgba(8,30,51,.25)}
+.top-in{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:11px;padding:12px 14px}
+.brand-name{font-family:Georgia,serif;font-size:19px;line-height:1.1;color:#fff}
+.brand-sub{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-top:2px}
+.count-chip{margin-left:auto;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);
+  border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;white-space:nowrap}
+.count-chip small{display:block;font-weight:600;font-size:10px;opacity:.85;letter-spacing:.06em;text-transform:uppercase}
+main{max-width:860px;margin:0 auto;padding:14px 14px 8px}
+.screen{display:none}
+.screen.on{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.scr-head{display:flex;align-items:center;gap:10px;margin:4px 0 12px}
+.scr-head h2{margin:0;font-size:22px;color:var(--navy)}
+.scr-head .sp{flex:1}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px;margin:0 0 12px}
+.card h3{margin:0 0 8px;font-size:16px;color:var(--navy)}
+.mut{color:var(--ink2)} .small{font-size:12.5px} .tiny{font-size:11px}
+.hero{background:linear-gradient(135deg,var(--deep) 0%,var(--navy) 52%,var(--ocean) 115%);color:#fff;border:none}
+.hero .lab{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#BCD2DF}
+.hero .big{font-family:Georgia,serif;font-size:42px;font-weight:700;line-height:1.05;margin:2px 0}
+.hero .sub{color:#D7E5ED;font-size:13.5px}
+.kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:0 0 12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:11px 12px}
+.kpi .lab{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.kpi .val{font-family:Georgia,serif;font-size:21px;font-weight:700;color:var(--navy);margin-top:2px}
+.kpi .sub{font-size:11.5px;color:var(--ink2)}
+@media(max-width:560px){.kpis{grid-template-columns:1fr 1fr}.kpi .val{font-size:19px}}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:10px;padding:10px 16px;font-weight:700}
+.btn.gold{background:var(--gold);color:var(--deep)}
+.btn.soft{background:var(--mist);color:var(--navy)}
+.btn.danger{background:#fff;color:var(--red);border:1px solid var(--red)}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:8px}
+.btn.block{display:block;width:100%;text-align:center}
+.sample-banner{background:linear-gradient(120deg,var(--ocean),var(--teal));color:#fff;border-radius:14px;padding:13px 14px;margin:0 0 12px;box-shadow:var(--shadow)}
+.sample-banner b{font-family:Georgia,serif}
+.subrow{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+.subrow:last-child{border-bottom:0}
+.subrow .grow{flex:1;min-width:0}
+.subname{font-weight:700;color:var(--navy)}
+.chip{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:2px}
+.chip.keep{background:var(--mist);color:var(--ocean)}
+.chip.cancel{background:#F9E8E6;color:var(--red)}
+.chip.negotiate{background:#FBF0DA;color:var(--amber)}
+.chip.downgrade{background:#E9E4F5;color:#5B4A8A}
+.chip.trial{background:var(--gold);color:var(--deep)}
+.cost{text-align:right;white-space:nowrap}
+.cost .per{font-weight:700;color:var(--navy)}
+.leakbar{height:7px;background:var(--mist);border-radius:99px;margin-top:5px;overflow:hidden}
+.leakbar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--ocean));border-radius:99px}
+label.fl{display:block;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);margin:12px 0 5px}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+nav.tabs button{background:none;border:0;color:var(--ink2);font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 10px}
+nav.tabs button.on{color:var(--navy)}
+nav.tabs .ic{font-size:19px;line-height:1}
+.step{display:flex;gap:11px;margin:0 0 13px}
+.step .n{flex:0 0 30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:13px}
+.modal-wrap{position:fixed;inset:0;background:rgba(8,30,51,.5);z-index:80;display:none;align-items:flex-end;justify-content:center}
+.modal-wrap.on{display:flex}
+.modal{background:#fff;border-radius:16px 16px 0 0;padding:18px;max-width:560px;width:100%}
+.modal h3{margin:0 0 8px;color:var(--navy)}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <div>
+    <div class="brand-name">Subscription &amp; Bill Audit</div>
+    <div class="brand-sub">Ore &amp; Tide · Your Financial Roadmap</div>
+  </div>
+  <div class="count-chip"><span id="chipCount">0</span><small>charges tracked</small></div>
+</div></header>
+
+<main>
+  <!-- DASHBOARD -->
+  <section class="screen on" id="scr-home">
+    <div id="sampleBanner"></div>
+    <div class="card hero">
+      <div class="lab">Total monthly burn</div>
+      <div class="big" id="dBurn">$0.00</div>
+      <div class="sub" id="dBurnSub">— per year across 0 recurring charges</div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="lab">Marked Cancel</div><div class="val" id="dCancel">$0.00<span class="small">/mo</span></div><div class="sub" id="dCancelYr">$0.00 a year</div></div>
+      <div class="kpi"><div class="lab">Negotiate</div><div class="val" id="dNeg">$0.00<span class="small">/mo</span></div><div class="sub">on the table</div></div>
+      <div class="kpi"><div class="lab">Recovered</div><div class="val" id="dRec">$0.00<span class="small">/mo</span></div><div class="sub" id="dRecYr">$0.00 a year, logged</div></div>
+    </div>
+    <div class="card">
+      <h3>⏳ Trial watch</h3>
+      <div id="dTrials" class="small"></div>
+    </div>
+    <div class="card">
+      <h3>Biggest leaks — by yearly cost</h3>
+      <div id="dLeaks"></div>
+    </div>
+    <button class="btn gold block" data-act="add">+ Add a recurring charge</button>
+  </section>
+
+  <!-- SUBSCRIPTIONS -->
+  <section class="screen" id="scr-subs">
+    <div class="scr-head"><h2>The Audit</h2><div class="sp"></div>
+      <button class="btn sm" data-act="add">+ Add</button></div>
+    <div class="card"><div id="subList"></div></div>
+    <p class="small mut">Sorted by yearly cost. Tap any charge to edit it, change its verdict, or mark it cancelled.</p>
+  </section>
+
+  <!-- EDIT -->
+  <section class="screen" id="scr-edit">
+    <div class="scr-head"><button class="btn soft sm" data-act="back-subs">← Back</button><h2 id="editTitle">Edit charge</h2></div>
+    <div class="card">
+      <label class="fl">Name</label><input type="text" id="fName" placeholder="e.g. StreamFlix">
+      <div class="grid2">
+        <div><label class="fl">Category</label><select id="fCat"></select></div>
+        <div><label class="fl">Verdict</label><select id="fVerdict"></select></div>
+      </div>
+      <div class="grid2">
+        <div><label class="fl">Amount ($)</label><input type="number" id="fAmt" step="0.01" min="0" inputmode="decimal"></div>
+        <div><label class="fl">Frequency</label><select id="fFreq"></select></div>
+      </div>
+      <div class="grid2">
+        <div><label class="fl">Next renewal</label><input type="date" id="fRenew"></div>
+        <div><label class="fl">Last used</label><input type="date" id="fUsed"></div>
+      </div>
+      <div class="grid2">
+        <div><label class="fl">Free trial?</label><select id="fTrial"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+        <div><label class="fl">Trial ends</label><input type="date" id="fTrialEnd"></div>
+      </div>
+      <p class="small mut" id="fComputed" style="margin-top:12px"></p>
+      <button class="btn block" data-act="save" style="margin-top:10px">Save</button>
+      <div id="editExisting" style="margin-top:10px">
+        <button class="btn soft block" data-act="cancel-flow">✓ Mark as cancelled — move to the log</button>
+        <button class="btn danger block" data-act="del" style="margin-top:8px">Delete this charge</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOG -->
+  <section class="screen" id="scr-log">
+    <div class="scr-head"><h2>Cancellation Log</h2></div>
+    <div class="card hero">
+      <div class="lab">Recovered so far</div>
+      <div class="big" id="lTotal">$0.00<span style="font-size:19px">/mo</span></div>
+      <div class="sub" id="lTotalYr">— a year, from 0 cancellations</div>
+    </div>
+    <div class="card"><div id="logList"></div></div>
+    <p class="small mut">The trophy shelf. Every cancellation here is money that stays in your account from now on.</p>
+  </section>
+
+  <!-- HOW TO -->
+  <section class="screen" id="scr-how">
+    <div class="scr-head"><h2>The 20-Minute Audit</h2></div>
+    <div class="card">
+      <div class="step"><div class="n">1</div><div><b>Minutes 0–5 — Gather the evidence.</b><br><span class="small mut">Open your bank and credit card statements from the last two months (three if you can — annual charges hide). Don't judge anything yet.</span></div></div>
+      <div class="step"><div class="n">2</div><div><b>Minutes 5–12 — List everything that repeats.</b><br><span class="small mut">One entry per recurring charge: the streaming duo, the gym, the storage plan, the app you forgot in March. Bills like internet and insurance count too.</span></div></div>
+      <div class="step"><div class="n">3</div><div><b>Minutes 12–16 — Give every charge a verdict.</b><br><span class="small mut">Keep means you'd buy it again today at this price. Cancel means it's done. Negotiate means you want it cheaper. Downgrade means the smaller tier would do. Be honest about Last Used — it settles most arguments.</span></div></div>
+      <div class="step"><div class="n">4</div><div><b>Minutes 16–19 — Cancel the easy wins now.</b><br><span class="small mut">Not this weekend — now, while the list is open. Use “Mark as cancelled” on each one and add the confirmation number. It lands on your Cancellation Log automatically.</span></div></div>
+      <div class="step"><div class="n">5</div><div><b>Minutes 19–20 — Read the Dashboard.</b><br><span class="small mut">Monthly burn, true yearly cost, and the savings you just found. That's the score. Re-run the audit every few months — subscriptions creep back; that's what they do.</span></div></div>
+      <p class="small mut">Free trials are the quietest charges of all. Mark them as trials with their end date, and the Dashboard counts down the ones ending in the next 30 days so you decide before they bill — not after.</p>
+    </div>
+    <div class="card">
+      <h3>Your data</h3>
+      <p class="small mut">Everything lives in this browser, on this device — no account, no server, works offline. Clearing your browser data clears the tracker, so keep that in mind.</p>
+      <div id="sampleActions"></div>
+    </div>
+    <p class="tiny mut" style="text-align:center">An organization tool, not financial advice. · Ore &amp; Tide Money LLC</p>
+  </section>
+</main>
+
+<nav class="tabs">
+  <button data-nav="home" class="on"><span class="ic">📊</span>Dashboard</button>
+  <button data-nav="subs"><span class="ic">🧾</span>The Audit</button>
+  <button data-nav="log"><span class="ic">🏆</span>Log</button>
+  <button data-nav="how"><span class="ic">⏱️</span>How To</button>
+</nav>
+
+<div class="modal-wrap" id="cancelModal"><div class="modal">
+  <h3>Mark as cancelled</h3>
+  <p class="small mut" id="cancelText"></p>
+  <label class="fl">Confirmation # (optional)</label>
+  <input type="text" id="cancelConf" placeholder="e.g. VV-CANCEL-4471">
+  <label class="fl">Notes (optional)</label>
+  <input type="text" id="cancelNotes" placeholder="Why you cancelled">
+  <button class="btn block" data-act="cancel-confirm" style="margin-top:14px">Move to the log</button>
+  <button class="btn soft block" data-act="cancel-close" style="margin-top:8px">Not yet</button>
+</div></div>
+
+<script>
+"use strict";
+const LSKEY = "ot-subscription-audit-v1";
+const CATEGORIES = ["Streaming","Music","Apps & Software","Gaming","News & Media","Fitness","Cloud & Storage","Utilities & Bills","Insurance","Finance","Kids & Family","Other"];
+const FREQUENCIES = ["Weekly","Monthly","Quarterly","Semiannual","Annual"];
+const VERDICTS = ["Keep","Cancel","Negotiate","Downgrade"];
+const FACTORS = {"Weekly":52/12,"Monthly":1,"Quarterly":1/3,"Semiannual":1/6,"Annual":1/12};
+
+const SAMPLE_SUBS = [
+  {"name":"StreamFlix","category":"Streaming","amount":15.49,"freq":"Monthly","renewal":"2026-12-03","trial":"No","trialEnd":"","lastUsed":"2026-11-15","verdict":"Keep"},
+  {"name":"VidVault","category":"Streaming","amount":13.99,"freq":"Monthly","renewal":"2026-11-28","trial":"No","trialEnd":"","lastUsed":"2026-08-02","verdict":"Cancel"},
+  {"name":"MusicWave","category":"Music","amount":11.99,"freq":"Monthly","renewal":"2026-12-05","trial":"No","trialEnd":"","lastUsed":"2026-11-14","verdict":"Keep"},
+  {"name":"TuneBox","category":"Music","amount":15.99,"freq":"Monthly","renewal":"2026-11-25","trial":"No","trialEnd":"","lastUsed":"2026-06-19","verdict":"Downgrade"},
+  {"name":"CloudNest Storage","category":"Cloud & Storage","amount":9.99,"freq":"Monthly","renewal":"2026-12-01","trial":"No","trialEnd":"","lastUsed":"2026-11-10","verdict":"Negotiate"},
+  {"name":"PhotoVault Backup","category":"Cloud & Storage","amount":59.99,"freq":"Annual","renewal":"2027-03-14","trial":"No","trialEnd":"","lastUsed":"2026-05-30","verdict":"Cancel"},
+  {"name":"FitTrack Pro","category":"Fitness","amount":12.99,"freq":"Monthly","renewal":"2026-11-29","trial":"Yes","trialEnd":"2026-11-29","lastUsed":"2026-11-12","verdict":"Cancel"},
+  {"name":"GameRealm Pass","category":"Gaming","amount":16.99,"freq":"Monthly","renewal":"2026-11-30","trial":"No","trialEnd":"","lastUsed":"2026-11-13","verdict":"Keep"},
+  {"name":"DesignDesk Pro","category":"Apps & Software","amount":22.99,"freq":"Monthly","renewal":"2026-12-09","trial":"No","trialEnd":"","lastUsed":"2026-10-02","verdict":"Negotiate"},
+  {"name":"HomeShield Renters Insurance","category":"Insurance","amount":18.50,"freq":"Monthly","renewal":"2026-12-02","trial":"No","trialEnd":"","lastUsed":"2026-11-01","verdict":"Keep"},
+  {"name":"NetFast Internet","category":"Utilities & Bills","amount":65.00,"freq":"Monthly","renewal":"2026-11-27","trial":"No","trialEnd":"","lastUsed":"2026-11-16","verdict":"Negotiate"},
+  {"name":"KidQuest Learning","category":"Kids & Family","amount":7.99,"freq":"Monthly","renewal":"2026-12-10","trial":"Yes","trialEnd":"2026-12-10","lastUsed":"2026-11-11","verdict":"Keep"},
+  {"name":"GroceryList Pro","category":"Other","amount":2.99,"freq":"Weekly","renewal":"2026-11-21","trial":"No","trialEnd":"","lastUsed":"2026-09-08","verdict":"Cancel"},
+  {"name":"SecureVPN","category":"Apps & Software","amount":29.97,"freq":"Quarterly","renewal":"2027-01-15","trial":"No","trialEnd":"","lastUsed":"2026-11-09","verdict":"Keep"},
+  {"name":"CarCare Club","category":"Other","amount":89.94,"freq":"Semiannual","renewal":"2027-02-06","trial":"No","trialEnd":"","lastUsed":"2026-10-22","verdict":"Keep"}
+];
+const SAMPLE_LOG = [
+  {"item":"VidVault","date":"2026-11-14","conf":"VV-CANCEL-4471","monthly":13.99,"notes":"Second streaming service — hadn't been opened since August."},
+  {"item":"PhotoVault Backup","date":"2026-11-15","conf":"PV-2026-9034","monthly":5.00,"notes":"Forgotten annual app. Photos already live in CloudNest, so this was paying twice."}
+];
+
+/* ---------- pure logic (shared with the spreadsheet edition's math) ---------- */
+function monthlyEq(amount, freq){ return (parseFloat(amount)||0) * (FACTORS[freq]||0); }
+function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function addDays(str, n){ const d=new Date(str+"T12:00:00"); d.setDate(d.getDate()+n); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function computeDashboard(subs, log, today){
+  const horizon = addDays(today, 30);
+  let burn=0, yearly=0, cancelM=0, cancelY=0, negM=0;
+  const trials=[], leaks=[];
+  subs.forEach(s=>{
+    const m = monthlyEq(s.amount, s.freq), y = m*12;
+    burn += m; yearly += y;
+    if(s.verdict==="Cancel"){ cancelM += m; cancelY += y; }
+    if(s.verdict==="Negotiate"){ negM += m; }
+    if(s.trial==="Yes" && s.trialEnd && s.trialEnd>=today && s.trialEnd<=horizon) trials.push({name:s.name, end:s.trialEnd});
+    leaks.push({name:s.name, yearly:y, monthly:m});
+  });
+  trials.sort((a,b)=> a.end<b.end ? -1 : 1);
+  leaks.sort((a,b)=> b.yearly-a.yearly);
+  let recM=0; log.forEach(e=>{ recM += parseFloat(e.monthly)||0; });
+  return {monthlyBurn:burn, yearlyTotal:yearly, count:subs.length,
+    cancelMonthly:cancelM, cancelYearly:cancelY, negotiateMonthly:negM,
+    trials:trials, leaks:leaks.slice(0,5),
+    recoveredMonthly:recM, recoveredYearly:recM*12, logCount:log.length};
+}
+
+/* ---------- state ---------- */
+let S = null, editIdx = -1;
+function sampleState(){ return {sample:true, subs:JSON.parse(JSON.stringify(SAMPLE_SUBS)), log:JSON.parse(JSON.stringify(SAMPLE_LOG))}; }
+function blankState(){ return {sample:false, subs:[], log:[]}; }
+function load(){
+  try{ const raw=localStorage.getItem(LSKEY); if(raw){ S=JSON.parse(raw); if(S && Array.isArray(S.subs) && Array.isArray(S.log)) return; } }catch(e){}
+  S = sampleState(); save();
+}
+function save(){ try{ localStorage.setItem(LSKEY, JSON.stringify(S)); }catch(e){} }
+
+/* ---------- rendering ---------- */
+const $ = id => document.getElementById(id);
+const money = v => "$" + (Math.round(v*100)/100).toLocaleString("en-US",{minimumFractionDigits:2, maximumFractionDigits:2});
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function fmtDate(str){ if(!str) return "—"; const d=new Date(str+"T12:00:00"); return d.toLocaleDateString("en-US",{month:"short", day:"numeric", year:"numeric"}); }
+
+function render(){
+  const t = todayStr();
+  const D = computeDashboard(S.subs, S.log, t);
+  $("chipCount").textContent = D.count;
+  $("dBurn").textContent = money(D.monthlyBurn);
+  $("dBurnSub").textContent = money(D.yearlyTotal) + " per year across " + D.count + " recurring charges";
+  $("dCancel").innerHTML = money(D.cancelMonthly) + "<span class='small'>/mo</span>";
+  $("dCancelYr").textContent = money(D.cancelYearly) + " a year";
+  $("dNeg").innerHTML = money(D.negotiateMonthly) + "<span class='small'>/mo</span>";
+  $("dRec").innerHTML = money(D.recoveredMonthly) + "<span class='small'>/mo</span>";
+  $("dRecYr").textContent = money(D.recoveredYearly) + " a year, logged";
+  if(D.trials.length){
+    $("dTrials").innerHTML = D.trials.map(tr=>{
+      const days = Math.round((new Date(tr.end+"T12:00:00") - new Date(t+"T12:00:00"))/86400000);
+      return "<div class='subrow'><div class='grow'><b>"+esc(tr.name)+"</b> — trial ends "+fmtDate(tr.end)+"</div><span class='chip trial'>"+(days===0?"today":days+"d left")+"</span></div>";
+    }).join("");
+  } else {
+    $("dTrials").innerHTML = "<span class='mut'>No free trials ending in the next 30 days. Quiet — the way it should be.</span>";
+  }
+  const maxY = D.leaks.length ? D.leaks[0].yearly : 0;
+  $("dLeaks").innerHTML = D.leaks.length ? D.leaks.map((l,i)=>
+    "<div class='subrow'><div class='grow'><span class='mut small'>#"+(i+1)+"</span> <b>"+esc(l.name)+"</b>" +
+    "<div class='leakbar'><i style='width:"+Math.max(4, Math.round(l.yearly/maxY*100))+"%'></i></div></div>" +
+    "<div class='cost'><div class='per'>"+money(l.yearly)+"/yr</div><div class='small mut'>"+money(l.monthly)+"/mo</div></div></div>"
+  ).join("") : "<span class='small mut'>Nothing tracked yet — add your first recurring charge.</span>";
+  // subs list
+  const sorted = S.subs.map((s,i)=>({s:s, i:i})).sort((a,b)=> monthlyEq(b.s.amount,b.s.freq)-monthlyEq(a.s.amount,a.s.freq));
+  $("subList").innerHTML = sorted.length ? sorted.map(({s,i})=>{
+    const m = monthlyEq(s.amount, s.freq);
+    const trialSoon = s.trial==="Yes" && s.trialEnd && s.trialEnd>=t && s.trialEnd<=addDays(t,30);
+    return "<div class='subrow' data-edit='"+i+"' style='cursor:pointer'><div class='grow'>" +
+      "<span class='subname'>"+esc(s.name)+"</span><span class='chip "+s.verdict.toLowerCase()+"'>"+esc(s.verdict)+"</span>" +
+      (trialSoon ? "<span class='chip trial'>trial ends "+fmtDate(s.trialEnd)+"</span>" : "") +
+      "<div class='small mut'>"+esc(s.category)+" · "+money(s.amount)+" / "+esc(s.freq.toLowerCase())+" · renews "+fmtDate(s.renewal)+"</div></div>" +
+      "<div class='cost'><div class='per'>"+money(m)+"/mo</div><div class='small mut'>"+money(m*12)+"/yr</div></div></div>";
+  }).join("") : "<span class='small mut'>No charges yet. Tap + Add and start the list — statements open, no mercy.</span>";
+  document.querySelectorAll("[data-edit]").forEach(el=> el.addEventListener("click", ()=> openEdit(parseInt(el.dataset.edit,10))));
+  // log
+  $("lTotal").innerHTML = money(D.recoveredMonthly) + "<span style='font-size:19px'>/mo</span>";
+  $("lTotalYr").textContent = money(D.recoveredYearly) + " a year, from " + D.logCount + " cancellation" + (D.logCount===1?"":"s");
+  $("logList").innerHTML = S.log.length ? S.log.map((e,i)=>
+    "<div class='subrow'><div class='grow'><b>"+esc(e.item)+"</b><div class='small mut'>Cancelled "+fmtDate(e.date)+(e.conf?" · Conf # "+esc(e.conf):"")+"</div>" +
+    (e.notes ? "<div class='small mut'>"+esc(e.notes)+"</div>" : "") + "</div>" +
+    "<div class='cost'><div class='per'>"+money(e.monthly)+"/mo</div><div class='small mut'>"+money((parseFloat(e.monthly)||0)*12)+"/yr</div></div>" +
+    "<button class='btn danger sm' data-logdel='"+i+"'>✕</button></div>"
+  ).join("") : "<span class='small mut'>Nothing cancelled yet. Your first win lands here.</span>";
+  document.querySelectorAll("[data-logdel]").forEach(el=> el.addEventListener("click", ()=>{
+    S.log.splice(parseInt(el.dataset.logdel,10),1); save(); render();
+  }));
+  // sample UI
+  $("sampleBanner").innerHTML = S.sample ?
+    "<div class='sample-banner'><b>This is the sample household</b> — a fictional family with 15 recurring charges, so you can see how everything reads. When you're ready: " +
+    "<button class='btn sm' style='background:#fff;color:var(--ocean)' data-act='clear-sample'>Clear it &amp; start mine</button></div>" : "";
+  $("sampleActions").innerHTML = S.sample ?
+    "<button class='btn danger block' data-act='clear-sample'>Clear the sample &amp; start mine</button>" :
+    "<button class='btn soft block' data-act='load-sample'>Reload the sample household</button>";
+  bindActs();
+}
+
+function show(name){
+  document.querySelectorAll(".screen").forEach(s=> s.classList.remove("on"));
+  $("scr-"+name).classList.add("on");
+  document.querySelectorAll("nav.tabs button").forEach(b=> b.classList.toggle("on", b.dataset.nav===name));
+  window.scrollTo(0,0);
+}
+function fillSelect(id, values){ $(id).innerHTML = values.map(v=> "<option>"+esc(v)+"</option>").join(""); }
+function openEdit(i){
+  editIdx = i;
+  const s = i>=0 ? S.subs[i] : {name:"", category:"Streaming", amount:"", freq:"Monthly", renewal:"", trial:"No", trialEnd:"", lastUsed:"", verdict:"Keep"};
+  $("editTitle").textContent = i>=0 ? "Edit charge" : "Add a charge";
+  $("fName").value = s.name; $("fCat").value = s.category; $("fVerdict").value = s.verdict;
+  $("fAmt").value = s.amount; $("fFreq").value = s.freq;
+  $("fRenew").value = s.renewal||""; $("fUsed").value = s.lastUsed||"";
+  $("fTrial").value = s.trial||"No"; $("fTrialEnd").value = s.trialEnd||"";
+  $("editExisting").style.display = i>=0 ? "block" : "none";
+  updateComputed(); show("edit");
+}
+function updateComputed(){
+  const a = parseFloat($("fAmt").value)||0, f = $("fFreq").value;
+  const m = monthlyEq(a, f);
+  $("fComputed").textContent = a>0 ? "That's " + money(m) + " a month — " + money(m*12) + " a year." : "";
+}
+function readForm(){
+  return {name:$("fName").value.trim(), category:$("fCat").value, amount:parseFloat($("fAmt").value)||0,
+    freq:$("fFreq").value, renewal:$("fRenew").value, trial:$("fTrial").value, trialEnd:$("fTrialEnd").value,
+    lastUsed:$("fUsed").value, verdict:$("fVerdict").value};
+}
+function bindActs(){
+  document.querySelectorAll("[data-act]").forEach(el=>{
+    if(el.dataset.bound) return; el.dataset.bound = "1";
+    el.addEventListener("click", ()=> act(el.dataset.act));
+  });
+}
+function act(a){
+  if(a==="add") openEdit(-1);
+  if(a==="back-subs") show("subs");
+  if(a==="save"){
+    const v = readForm();
+    if(!v.name){ alert("Give the charge a name first."); return; }
+    if(editIdx>=0) S.subs[editIdx] = v; else S.subs.push(v);
+    S.sample = S.sample && editIdx>=0 ? S.sample : S.sample; save(); render(); show("subs");
+  }
+  if(a==="del"){
+    if(editIdx>=0 && confirm("Delete this charge from the list?")){ S.subs.splice(editIdx,1); save(); render(); show("subs"); }
+  }
+  if(a==="cancel-flow"){
+    if(editIdx<0) return;
+    const s = S.subs[editIdx];
+    $("cancelText").textContent = s.name + " — " + money(monthlyEq(s.amount,s.freq)) + "/mo (" + money(monthlyEq(s.amount,s.freq)*12) + "/yr) moves to your Cancellation Log with today's date.";
+    $("cancelConf").value = ""; $("cancelNotes").value = "";
+    $("cancelModal").classList.add("on");
+  }
+  if(a==="cancel-close") $("cancelModal").classList.remove("on");
+  if(a==="cancel-confirm"){
+    if(editIdx<0) return;
+    const s = S.subs[editIdx];
+    S.log.unshift({item:s.name, date:todayStr(), conf:$("cancelConf").value.trim(), monthly:Math.round(monthlyEq(s.amount,s.freq)*100)/100, notes:$("cancelNotes").value.trim()});
+    S.subs.splice(editIdx,1);
+    $("cancelModal").classList.remove("on");
+    save(); render(); show("log");
+  }
+  if(a==="clear-sample"){
+    if(confirm("Clear the sample household and start with empty lists? This can't be undone.")){ S = blankState(); save(); render(); show("subs"); }
+  }
+  if(a==="load-sample"){
+    if(confirm("Reload the sample household? It replaces what's here now.")){ S = sampleState(); save(); render(); show("home"); }
+  }
+}
+document.querySelectorAll("nav.tabs button").forEach(b=> b.addEventListener("click", ()=> show(b.dataset.nav)));
+["fAmt","fFreq"].forEach(id=> $(id).addEventListener("input", updateComputed));
+fillSelect("fCat", CATEGORIES); fillSelect("fFreq", FREQUENCIES); fillSelect("fVerdict", VERDICTS);
+load(); render();
+</script>
+</body>
+</html>
