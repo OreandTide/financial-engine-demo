@@ -1,0 +1,81 @@
+{
+ "version": 1,
+ "generated": "2026-11-25",
+ "note": "Per-state packaging v1 (Joshua's ruling, Nov 25, 2026). National shards for the 26 live states are untouched. A state package carries the state's water, rivers and roads, sliced verbatim from the gated packaged shards by representative point in the state's pipeline bbox; the shared regional land ring + boundaries stay in the base package and change only when the region box changes. Places ride the basemap bins. Production refinement: attribute by state-boundary polygon instead of bbox.",
+ "base": {
+  "files": [
+   {
+    "path": "proof-slice-geo-a.json",
+    "bytes": 4405734,
+    "md5": "b192be5ad03561a8ffc697feaa23af6f"
+   },
+   {
+    "path": "proof-slice-geo-a3-1.json",
+    "bytes": 2671371,
+    "md5": "065de7173fb289291456593d9c29f3d6"
+   },
+   {
+    "path": "proof-slice-geo-a3-2.json",
+    "bytes": 2671410,
+    "md5": "0786cbb3e6f1f2ed1ee154aca9e722b3"
+   },
+   {
+    "path": "proof-slice-geo-c.json",
+    "bytes": 5163453,
+    "md5": "5c1970de3494280c41f28dd89e45bc0d"
+   },
+   {
+    "path": "proof-slice-geo-c2.json",
+    "bytes": 2534342,
+    "md5": "acc39ec194e03f9c103dbabc5259d487"
+   }
+  ]
+ },
+ "states": [
+  {
+   "code": "mn",
+   "name": "Minnesota",
+   "bbox": [
+    -97.31,
+    43.44,
+    -89.44,
+    49.46
+   ],
+   "files": [
+    {
+     "path": "mn/mn-water.json",
+     "bytes": 1733050,
+     "md5": "18ccb8f74c1f6889c88080b8ac66fb69",
+     "collections": {
+      "water": 263,
+      "rivers": 4979
+     }
+    },
+    {
+     "path": "mn/mn-roads-1.json",
+     "bytes": 487589,
+     "md5": "18a794f93ea73d088017e57263daa601",
+     "collections": {
+      "roadsW1": 2
+     }
+    },
+    {
+     "path": "mn/mn-roads-2.json",
+     "bytes": 374663,
+     "md5": "951cc32806add7ab5ea06346d95d9d5e",
+     "collections": {
+      "roadsW2": 1
+     }
+    },
+    {
+     "path": "mn/mn-roads-3.json",
+     "bytes": 227397,
+     "md5": "af7062177bc6ea022e7f7f619a1a3783",
+     "collections": {
+      "roadsW3": 2
+     }
+    }
+   ]
+  }
+ ]
+}
