@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ore &amp; Tide — Member Dashboard (Prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2D4F; --coastal:#2A6F8F; --mist:#E8F1F5; --sand:#F3E9D7;
+    --gold:#D4A857; --success:#1E5D7A; --info:#3B82F6; --warning:#F59E0B; --alert:#EF4444;
+    --ink:#12293F; --muted:#5B7186; --card:#FFFFFF; --line:#D8E4EC;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Inter',-apple-system,'Segoe UI',sans-serif; color:var(--ink);
+    background:linear-gradient(180deg,#0B2D4F 0%,#123B63 210px,#E8F1F5 460px);
+    min-height:100vh; padding:0 22px 48px;
+  }
+  .wrap{max-width:1140px; margin:0 auto;}
+  header{padding:24px 4px 6px; color:#fff;}
+  .toprow{display:flex; justify-content:space-between; align-items:center;}
+  .brand{display:flex; align-items:center; gap:12px;}
+  .logo-chip{display:flex; align-items:center;}
+  .logo-chip img{height:38px; width:auto; display:block;}
+  .wordmark{font-family:'Lora',Georgia,serif; font-size:16px; letter-spacing:.26em; font-weight:600;}
+  .wordmark span{color:var(--gold);}
+  nav{display:flex; gap:6px;}
+  .navlink{background:none; border:none; cursor:pointer; font-family:'Inter',sans-serif; font-size:13.5px;
+    color:#BFD4E2; padding:7px 13px; border-radius:99px; letter-spacing:.02em;}
+  .navlink:hover{color:#fff;}
+  .navlink.active{background:rgba(255,255,255,.14); color:#fff; font-weight:600;}
+  .pagehead{padding:14px 4px 4px; color:#fff;}
+  .pagehead h1{font-family:'Lora',Georgia,serif; font-size:30px; font-weight:600; line-height:1.2;}
+  .pagehead p{font-size:13.5px; color:#BFD4E2; margin-top:5px;}
+  .proto-tag{display:inline-block; margin-top:10px; font-size:10.5px; font-weight:600; letter-spacing:.12em;
+    color:var(--navy); background:var(--sand); padding:4px 9px; border-radius:99px;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; margin-top:14px;
+    box-shadow:0 6px 22px rgba(11,45,79,.08);}
+  .card h2{font-family:'Lora',Georgia,serif; font-size:17px; font-weight:600; color:var(--navy);}
+  .card .sub{font-size:12.5px; color:var(--muted); margin-top:3px; line-height:1.5;}
+  .grid{display:grid; grid-template-columns:7fr 5fr; gap:14px; align-items:start;}
+  @media (max-width:880px){ .grid{grid-template-columns:1fr;} nav{flex-wrap:wrap;} }
+  /* Journey */
+  .journey-box{background:linear-gradient(160deg,#0E3357,#2A6F8F); border-radius:14px; padding:16px 14px 12px; margin-top:12px; color:#fff;}
+  .journey-box svg{width:100%; height:auto; display:block;}
+  .journey-stats{display:flex; gap:10px; margin-top:12px;}
+  .jstat{flex:1; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.16); border-radius:12px; padding:9px 10px;}
+  .jstat .k{font-size:10px; letter-spacing:.1em; color:#BFD4E2; font-weight:600;}
+  .jstat .v{font-size:15.5px; font-weight:700; margin-top:2px;}
+  .jstat .v.gold{color:var(--gold);}
+  /* Stat tiles */
+  .statrow{display:flex; gap:10px; margin-top:14px;}
+  .stat{flex:1; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 14px; box-shadow:0 4px 14px rgba(11,45,79,.06);}
+  .stat .k{font-size:10px; letter-spacing:.1em; color:var(--muted); font-weight:700;}
+  .stat .v{font-size:17px; font-weight:700; color:var(--navy); margin-top:3px;}
+  .stat .s{font-size:12px; color:var(--muted); margin-top:2px;}
+  /* Paycheck scene — one river, three mountains */
+  .flow{position:relative; background:#E6F1F6; border:1px solid #DCE9F0; border-radius:16px; padding:12px 8px 4px;}
+    #flowArt svg{width:100%; height:auto; display:block;}
+    .flow-logo{position:absolute; left:50%; top:8.2%; width:4.6%; transform:translateX(-50%); z-index:3;}
+    .scene{position:relative; border-radius:14px; overflow:hidden; margin-top:12px; box-shadow:0 8px 24px rgba(11,45,79,.18); aspect-ratio:1040/693; background:#D8F0EC;}
+  .scene-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  .mtn{position:absolute; transform:translateX(-50%); z-index:1;}
+  img.mtn{width:auto;}
+  
+  #sceneArt, #sceneArt svg{position:absolute; inset:0; width:100%; height:100%; display:block; z-index:2;}
+  .legend{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;}
+  .legend .li{flex:1; min-width:150px; border:1px solid var(--line); border-radius:12px; padding:10px 12px;}
+  .legend .li .row{display:flex; justify-content:space-between; align-items:baseline;}
+  .legend .nm{font-weight:700; font-size:13.5px;}
+  .legend .nm i{display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:7px;}
+  .legend .val{font-weight:700; font-size:15px; color:var(--navy);}
+  .legend .why{font-size:12px; color:var(--muted); margin-top:4px; line-height:1.45;}
+  .slider-head{display:flex; justify-content:space-between; margin-top:14px; font-size:12px; font-weight:700;}
+  .slider-head .spend-lbl{color:#3E8CA7;}
+  .slider-head .fut-lbl{color:#96762F;}
+  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:8px; border-radius:99px; margin-top:7px; outline:none; background:#D8E4EC;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:24px; height:24px; border-radius:50%; background:#fff; border:2px solid var(--line); box-shadow:0 1px 5px rgba(11,45,79,.3); cursor:pointer;}
+  input[type=range]::-moz-range-thumb{width:22px; height:22px; border-radius:50%; background:#fff; border:2px solid var(--line); box-shadow:0 1px 5px rgba(11,45,79,.3); cursor:pointer;}
+  .slider-vals{display:flex; justify-content:space-between; margin-top:8px; font-size:15px; color:var(--navy);}
+  .slider-vals .pct{font-size:12px; color:var(--muted); font-weight:400;}
+  .why-line{font-size:12.5px; color:var(--muted); line-height:1.55; margin-top:11px;}
+  .why-line b{color:var(--success);}
+  .btn{display:block; width:100%; border:none; cursor:pointer; margin-top:14px; padding:13px;
+    background:var(--navy); color:#fff; font-family:'Inter',sans-serif; font-size:14.5px; font-weight:600; border-radius:12px;}
+  .btn.ghost{background:#fff; color:var(--navy); border:1.5px solid var(--navy);}
+  .btn:active{transform:scale(.99);}
+  .checkin{margin-top:12px; border-top:1px dashed var(--line); padding-top:12px; display:none;}
+  .checkin.open{display:block;}
+  .cstep{display:flex; gap:9px; align-items:flex-start; padding:7px 0; font-size:13.5px; color:var(--muted);}
+  .cstep .dot{flex:none; width:20px; height:20px; border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--muted); background:#fff;}
+  .cstep.done{color:var(--ink);}
+  .cstep.done .dot{background:var(--success); border-color:var(--success); color:#fff;}
+  /* Next move */
+  .nextmove{background:linear-gradient(150deg,#FBF4E2,#F3E9D7); border:1px solid #E7D5AC;}
+  .nextmove .kicker{font-size:10.5px; font-weight:700; letter-spacing:.14em; color:#96762F;}
+  .nextmove h2{color:#6B5518;}
+  .toggle-row{display:flex; justify-content:space-between; align-items:center; margin-top:13px; gap:12px;}
+  .toggle-row .lbl{font-size:13.5px; line-height:1.4;}
+  .switch{position:relative; flex:none; width:54px; height:30px; background:#C7D3DD; border-radius:99px; cursor:pointer; transition:background .2s; border:none;}
+  .switch::after{content:''; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#fff; transition:left .2s; box-shadow:0 1px 4px rgba(0,0,0,.25);}
+  .switch.on{background:var(--success);}
+  .switch.on::after{left:27px;}
+  .impact{display:flex; gap:10px; margin-top:13px;}
+  .impact .cell{flex:1; background:rgba(255,255,255,.65); border-radius:11px; padding:9px 10px; text-align:center;}
+  .impact .k{font-size:10px; letter-spacing:.08em; color:#96762F; font-weight:700;}
+  .impact .v{font-size:15px; font-weight:700; color:var(--navy); margin-top:2px;}
+  /* Debts, stops, milestones */
+  .debt{padding:11px 0; border-bottom:1px solid var(--line);}
+  .debt:last-child{border-bottom:none; padding-bottom:2px;}
+  .debt .row{display:flex; justify-content:space-between; align-items:baseline;}
+  .debt .nm{font-weight:600; font-size:14.5px;}
+  .debt .bal{font-weight:700; font-size:15px;}
+  .debt .meta{font-size:12.5px; color:var(--muted); margin-top:3px; line-height:1.5;}
+  .pill{display:inline-block; font-size:10.5px; font-weight:700; padding:2.5px 8px; border-radius:99px; letter-spacing:.03em;}
+  .pill.plan{background:#E2F0E9; color:var(--success);}
+  .pill.warn{background:#FDECEC; color:var(--alert);}
+  .pill.info{background:#E4EDF9; color:var(--info);}
+  .stop{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #EDF2F6; font-size:13.5px;}
+  .stop:last-child{border-bottom:none;}
+  .stop .d{color:var(--muted); font-size:12.5px;}
+  .leak{margin-top:11px; background:var(--mist); border-radius:11px; padding:10px 12px; font-size:13px; line-height:1.5;}
+  .mile{display:flex; gap:11px; padding:10px 0; border-bottom:1px solid #EDF2F6; align-items:flex-start;}
+  .mile:last-child{border-bottom:none;}
+  .mile .mk{flex:none; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; margin-top:1px;}
+  .mile .mk.done{background:var(--success); color:#fff;}
+  .mile .mk.next{background:#fff; border:2px solid var(--gold); color:#96762F;}
+  .mile .mk.far{background:#fff; border:2px solid var(--line); color:var(--muted);}
+  .mile .t{font-size:14px; font-weight:600;}
+  .mile .s{font-size:12.5px; color:var(--muted); margin-top:1px;}
+  /* Review, lessons, ask */
+  .review p{font-size:13.8px; line-height:1.6; margin-top:9px;}
+  .review p b{color:var(--navy);}
+  .review .sig{font-size:12.5px; color:var(--muted); margin-top:11px;}
+  .lesson{border:1px solid var(--line); border-radius:14px; padding:14px; margin-top:10px;}
+  .lesson .tag{font-size:10px; font-weight:700; letter-spacing:.12em; color:var(--coastal);}
+  .lesson h3{font-family:'Lora',Georgia,serif; font-size:15.5px; color:var(--navy); margin-top:4px;}
+  .lesson p{font-size:13.3px; line-height:1.6; margin-top:6px;}
+  .lesson .applies{font-size:12.5px; color:var(--muted); margin-top:7px;}
+  .qa{border-top:1px solid var(--line);}
+  .qa:first-of-type{margin-top:8px;}
+  .qa button{width:100%; background:none; border:none; text-align:left; cursor:pointer; padding:12px 2px;
+    font-family:'Inter',sans-serif; font-size:14px; font-weight:600; color:var(--navy); display:flex; justify-content:space-between; align-items:center;}
+  .qa .ans{display:none; font-size:13.5px; line-height:1.6; color:var(--ink); padding:0 2px 13px;}
+  .qa.open .ans{display:block;}
+  .qa .chev{color:var(--muted); font-weight:400;}
+  .teaser p{font-size:13.8px; line-height:1.6; margin-top:8px;}
+  .about p{font-size:14.5px; line-height:1.7; margin-top:10px;}
+  .about .brandline{font-family:'Lora',Georgia,serif; font-size:19px; line-height:1.5; color:var(--navy);}
+  .steps{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
+  .steps .st{flex:1; min-width:180px; background:var(--mist); border-radius:12px; padding:12px 14px;}
+  .steps .st .n{font-family:'Lora',Georgia,serif; font-weight:700; color:var(--coastal); font-size:15px;}
+  .steps .st .t{font-weight:700; font-size:13.5px; margin-top:3px;}
+  .steps .st .s{font-size:12.5px; color:var(--muted); margin-top:3px; line-height:1.5;}
+  footer{text-align:center; font-size:11.5px; color:var(--muted); margin-top:22px; line-height:1.6;}
+  footer img{height:30px; width:auto; opacity:.85; margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="toprow">
+      <div class="brand">
+        <div class="logo-chip"><img src="data:image/png;base64,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" alt="Ore &amp; Tide logo"></div>
+        <div class="wordmark">ORE <span>&amp;</span> TIDE</div>
+      </div>
+      <nav>
+        <button class="navlink active" data-page="dashboard">Dashboard</button>
+        <button class="navlink" data-page="plan">Plan</button>
+        <button class="navlink" data-page="coaching">Coaching</button>
+        <button class="navlink" data-page="about">About</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============ PAGE: DASHBOARD ============ -->
+  <main class="page active" id="page-dashboard">
+    <div class="pagehead">
+      <h1>Seth, your money is on course.</h1>
+      <p>Member dashboard · November 2026</p>
+      <span class="proto-tag">PROTOTYPE — SAMPLE MEMBER</span>
+    </div>
+
+    <section class="card">
+      <h2>Your journey</h2>
+      <p class="sub">One destination: debt-free. Every bill is just a planned stop.</p>
+      <div class="journey-box">
+        <svg viewBox="0 0 980 150" role="img" aria-label="Route from payday to debt-free">
+          <path d="M20,108 C200,38 340,124 520,68 C700,18 830,58 938,36" fill="none" stroke="#7FB0C9" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 7"/>
+          <circle cx="20" cy="108" r="6" fill="#fff"/>
+          <circle cx="272" cy="70" r="5" fill="#2A6F8F" stroke="#fff" stroke-width="2"/>
+          <circle cx="520" cy="68" r="5" fill="#2A6F8F" stroke="#fff" stroke-width="2"/>
+          <circle cx="742" cy="40" r="5" fill="#2A6F8F" stroke="#fff" stroke-width="2"/>
+          <path d="M938 14 l5 10.5 L954 25 l-7.7 7 2.1 10.4 -10.4 -5.5 -10.4 5.5 2.1 -10.4 -7.7 -7 11 -.5 Z" fill="#D4A857"/>
+          <text x="20" y="136" fill="#BFD4E2" font-size="11" font-family="Inter,sans-serif">PAYDAY</text>
+          <text x="248" y="52" fill="#DCEAF2" font-size="11" font-family="Inter,sans-serif">RENT</text>
+          <text x="488" y="94" fill="#DCEAF2" font-size="11" font-family="Inter,sans-serif">CARD 2</text>
+          <text x="712" y="24" fill="#DCEAF2" font-size="11" font-family="Inter,sans-serif">CARD 1</text>
+          <text x="884" y="66" fill="#D4A857" font-size="11" font-weight="700" font-family="Inter,sans-serif">DEBT-FREE</text>
+        </svg>
+        <div class="journey-stats">
+          <div class="jstat"><div class="k">DESTINATION</div><div class="v gold" id="jDest">Jul 2031</div></div>
+          <div class="jstat"><div class="k">TOTAL DEBT</div><div class="v">$5,359</div></div>
+          <div class="jstat"><div class="k">INTEREST AVOIDED</div><div class="v" id="jSaved">$5,565</div></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="statrow">
+      <div class="stat"><div class="k">SAFE TO SPEND</div><div class="v" id="statSafe">$41/day</div><div class="s">until Dec 4</div></div>
+      <div class="stat"><div class="k">NEXT PLANNED STOP</div><div class="v">Streamly</div><div class="s">Nov 22 · $15.49 · already covered</div></div>
+      <div class="stat"><div class="k">CARD 1 FUNERAL</div><div class="v" id="statFuneral">Jul 2031</div><div class="s">on plan</div></div>
+    </div>
+
+    <section class="card">
+      <h2 style="font-size:21px;">Every paycheck, planned.</h2>
+      <p class="sub">Your split for this pay cycle — Fri, Nov 20 → Thu, Dec 3. Every paycheck flows downhill: bills first, then what's safe to spend, then your future.</p>
+      <div class="flow" id="flow"><img class="flow-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAVoAAAG2CAMAAAAJCb69AAAA/1BMVEX///////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADWN0BnAAAAQHRSTlMA/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAft0+HgAACXtJREFUeNrt3cmi6zgIBFD4/5/ufb8k1wMFVai0Tiw4IrItD4lwc3Nzc3Nzc9Nr+b0Zp1rUxA2mFoajGhital6wq3mhrsZNdLOrefVYT9PNiWZY4+rBbsfN6WZY4+rBLtRNrmZY4+rB7sBN3mZZ28rBKuOmQjOsbeVg9XBTqx0r2zB2Z8E2D+MZsDq9aslqdk0vOz2wS2GXBcEiSzTGq2RPCac7lfNC2pPFAlzeBMRtucNXtuUPXdVWIm5JW5WY9WyFIhbDdbSOVSxexb2uSMiah+EKUR9w7sgeoPKKh2VXRa++ck9ru+F6E2cKOy6SUmax5Nq+7ApoCDQ22033UXHZnniHmmW181l4OzBJRitvYqdIaumjFyr3o4RiG09s8bNYw6ltfsotRnNbLTub3WrZ0fyWww5muF92KscTZIeyPEJ2xJZk/WKhLcvKEEPdbpwNcqMt0XLmMlumheJdtFxL8KtsyS5uLLKlu2y0xpbm4IDKtqOTkXOkHbaUV5GPoB06r99gyzgd7LBllWWwXTkdkNzOslWWwHatrPaUQDvRktiulVWeEujvOJWNgL5odacEhdukNctW4wZ0ybL1rf0oW/YdSF8ovbREsnplKzIdKJatTNHK2SrJTtualqRstWSVylZNVshW4WFVpsc8ZRZJM/faMu8yFtOyFq2GrWTRDj/5vbpoTYuTFbCVlUWHp02bqWq7XXbyRRumnSxbadnBsqUu2szdtuqyvLTyRctrS3rUSGOLoVWRHXsdF2nRpgjtcyHGgJeU7YqizanXyDHS3hBTteWWvfNh08Jo07QPsDRtFWTHp4RHndLNXV8CmLXdRvv+Oy0RU80Hz5RGbZ90STZx/ep+0vZBj2Tz1u/eSctWrGjLv3oC7SseyrJlmQ/eFZ5Q2VLtDt6d4KBDr6OlLNrJKaFul0sqS2nLQFvyc56yvdcdT3BVd6QAw5enLdoOMS2zLJ/tmqKdmhJ4aSs9yGhzlra20iZsWWmrLQZsa2iDnpbrP4EmaQFFxly2HEE977LdlpEWNDF221bQ9hdtmJaL4NaGE/mm7zbabCuu65suSIyA9t9ywf1s79011nX0haL9VC6wCfHa1kszm6O9fQNnoG07xvHiB8tybdmL570mTJuNqXbbXt3qzG4FcZzX1uUo7YRsn+0k7Yxs25suB2mnZLvKVoe2+RoG1BZMm3O0TbZTtJOyTbZDtLOyPbZvaeUm2r4AZmjHZTtCGKElkG04vJ2gpZDF2w7QksjC47i4rdbL1j2y8EjaaXlk0bGQ00bo2nbTJhUtNJxmWjJZ6I+ol5ZOFmnbSnv9Wmqb7L/dRtUNbp20f5XDiOznXitsG2kv/NAGZL90WmDLQfvhMxEDtqXLqH209zqK6Ld9tARAQHvvFqiIftvLEZPR3qiBftkvfb5Mepz242ej3/Zt0GOLiqNnBYDzCR5aUdkfkbPQ6sq+se2gVZZ9YdtwH4K27Nf4CWjVZR/bztFGLLeF0+rDPk0CTbtC9lEa6Ptrl8g+SeTyevoz2jWyX3OZot0k+yUbLtrYRJsztLtk79Ytknad7D3be2v/BaMWcYotjnYj7K20YLRLZa8nlijaXEt71fbGHTi3aBfLXrWtoL36a4g17SXtm48ul/2cYA/tetkrthDaA2Qv2JbQ5oGyf9omgPYQ2b9sX+/1r41WxHm2LbSxtvXSniQbvx6/KKLNU2V/5JsFZ6+/txdxpm0W054n+zXnktWsXyMVcaptyRrsj4GKM1reeqgvHpTtqbKfnpfMUtpzZe8953uf9mTZO7awwWnKjtgWNjjdOfHZor7PVSgj8bzMhmzHQTXWmIGZcmUab8y4DLLyjDlmXKZhO3ShtMyuBGMPGRUOVzju456ngs7iNmXLd4SeucQWMiZUsGNTF+J7bLAzlRBUtJlqto877I00we1Y2sQ3Ilmyf4EmtH3RV1uY2dTaaIOENvsaS9E2/Q90pqgtiDY1ZZtqAv9tPtimmmCgzdS1hdGmqmxDVXTMJ5SyRbZA2lSFxZfFNC1QrMO2YOuo8OBlCLYt2DYovJZf99Bs1rkNoOzjjghoIUPfuTdqn89ikrZ1Nw+hTTRt0stm/65iYDP9sLgjsKSkbYLFnjmUbbQyuB5Z8ElZ3TYLg6OShfwLewzZcsEiaKc2NXqOUGebTTOktGyOy8LPPaZkuWmTaQfWsXJbPVTIdd9J2Zwu2vfbI5D9/LHxon1rOyz767PTRftyiy3LBje/V3+IP3GYPCr71ze4abMBtl720V/NUi1J9FypeTEe87QPbXOyaC/lNC/7bLbllo27/+PLQ9t2u8ubcxkC2fsXnhVk6xbuEJsOuOwT2mimrd92NMDuL9p/Nt5xzPX0lESsaK+fHWa6aDEtx2nlinYE1kULk+UoWgLZTNOqwHLMB9OymVtpc5Y2cy3trGwulp2cDhLYDi7aBDd6WlFXCtr+os2eNk7bK5t9LaZps7loz6HtljXt2Cn18FTb+GKc0N2JDdNOyAbzfND3zqEQth2lHZIleQ0iMukxWZI3TOKyzjna2E07KUtN2/E6p9C2naIdlu2wfR4CPDHTaso22L6IQFuW4bX09dlzyMJtXwUATMi0yrJo25f9g5KJWGDbe7k1TYuxTTZZ8rLN+iwidtg2rf0V/5KW0BasUSWrLNQWf4hfH5CILfiICRLQebb/2xosnENpG6LRsQ0m24hNtqYdpY3VsieUbcQyW56yjW22OhfuXbaCsrvLNmKhrciVJNvK0sZS2jiaNpbL7rSNWGurcPRnW2lZRIKmXVm2ES5bTNcRtsV0HbHedqjvOIB2xjbCtpjOI86w7e88wraYziNsC+o9DrJt7T242/Dh+2LZcdvYK0tw2rkUlqBsJe6glbWNnbActpTPLa2xjcm39Oy3DdSLKWz7MaIQb9tX/o8+vLWtbW1rW9valszWuLaVtDWubSVtjWtbSVvjAm2Ni6M1LtLWuAc832Vc2xqXx/Zw3YQ329pX1fan8Vr6HG8uXMuq2XrCtawarY8TLKtm6+Nby6rh+sTMsmq2XlCwrJqtF8IsK2brxXHLqtlG2NayWrYRtrWsFK5dUbZWRdnaFGVrUZStPVG21kTZ2hJla0mQrRlRuDZE2VoQZWs/lK31ULa2Q9laDmRrNhSuzVC2FkPZ2gtlay2QralQuHZC2VoJZWsjkK2BULjWQdnaBmRrGBSuVUC2JkHZGgRlaw4Uri1AtoZA4VoBZSsU7H9SCsUx/0YcQQAAAABJRU5ErkJggg==" alt="Ore & Tide logo"><div id="flowArt"></div></div>
+      <div class="slider-head"><span class="spend-lbl">● Spend</span><span class="fut-lbl">Future ●</span></div>
+      <input type="range" id="splitSlider" min="0" max="689" step="5" value="110" aria-label="Adjust spend versus future">
+      <div class="slider-vals"><span><b id="spendVal"></b><br><span class="pct" id="spendPct"></span></span><span style="text-align:right;"><b id="futVal"></b><br><span class="pct" id="futPct"></span></span></div>
+      <p class="why-line" id="splitWhy"></p>
+      <button class="btn" id="checkinBtn">Run my payday check-in</button>
+      <div class="checkin" id="checkin">
+        <div class="cstep" data-step><span class="dot">1</span><span>Bills checked — every stop before Dec 4 is covered in full.</span></div>
+        <div class="cstep" data-step><span class="dot">2</span><span>Split confirmed — spending money and future money are in their stretches of road.</span></div>
+        <div class="cstep" data-step><span class="dot">3</span><span>You're on course. Next check-in: payday, Dec 4.</span></div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <div class="col">
+        <section class="card nextmove">
+          <div class="kicker">YOUR ONE NEXT MOVE</div>
+          <h2>Freeze Card 1 at $150 a month</h2>
+          <p class="sub" style="color:#7A6526;">This month it's $150 either way. Freezing is about next month — and every month after.</p>
+          <div class="toggle-row">
+            <div class="lbl"><b>Payment freeze</b><br><span style="color:#7A6526; font-size:12.5px;">Keep paying $150 even as the minimum shrinks.</span></div>
+            <button class="switch on" id="freezeToggle" aria-label="Toggle payment freeze"></button>
+          </div>
+          <div class="impact">
+            <div class="cell"><div class="k">CARD 1 GONE</div><div class="v" id="impDate">Jul 2031</div></div>
+            <div class="cell"><div class="k">INTEREST</div><div class="v" id="impInt">$3,322</div></div>
+            <div class="cell"><div class="k">YOU SAVE</div><div class="v" id="impSave">$5,565</div></div>
+          </div>
+        </section>
+      </div>
+      <div class="col">
+        <section class="card teaser">
+          <h2>From your coach</h2>
+          <p>“Five subscriptions are quietly taking $94.45 a month. None of them is a disaster — together they're a car payment. Your full November review is on the Coaching page.”</p>
+          <button class="btn ghost" data-goto="coaching">Read the November review</button>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ PAGE: PLAN ============ -->
+  <main class="page" id="page-plan">
+    <div class="pagehead">
+      <h1>Your plan</h1>
+      <p>The debts, the stops, and the milestones between here and debt-free.</p>
+    </div>
+
+    <section class="card">
+      <h2>Your debts</h2>
+      <p class="sub">Highest rate first — that's the fastest way out.</p>
+      <div class="debt">
+        <div class="row"><span class="nm">Card 1</span><span class="bal">$5,000</span></div>
+        <div class="meta">24% APR · <span id="card1Pay">$150/mo, frozen</span> · <span class="pill plan" id="card1Pill">ON PLAN</span><br>Paid off: <b id="card1Date">Jul 2031</b> · Why this one first? It charges you $100 a month just to stand still.</div>
+      </div>
+      <div class="debt">
+        <div class="row"><span class="nm">Card 2 — “The Compliment”</span><span class="bal">$359</span></div>
+        <div class="meta">0% promo over · $25/mo · <span class="pill info">IN THE PLAN</span><br>Paid off: <b id="card2Date"></b> · Small balance, short goodbye.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Planned stops this cycle</h2>
+      <p class="sub">Bills and subscriptions, already counted in your split.</p>
+      <div id="stops"></div>
+      <div class="leak" id="leakLine"></div>
+    </section>
+
+    <section class="card">
+      <h2>Milestones</h2>
+      <p class="sub">Progress you can see — the scoreboard, made real.</p>
+      <div class="mile"><span class="mk done">✓</span><div><div class="t">Paycheck split set</div><div class="s">Nov 20 · Bills, Spend and Future each have their stretch of road.</div></div></div>
+      <div class="mile"><span class="mk done">✓</span><div><div class="t">Card 2 named and planned</div><div class="s">“The Compliment” · $359 · gone May 2028 on $25 a month.</div></div></div>
+      <div class="mile"><span class="mk next">→</span><div><div class="t">First $500 in Future</div><div class="s">Projected Apr 2027 at $110 a month.</div></div></div>
+      <div class="mile"><span class="mk far">·</span><div><div class="t">Card 1 funeral</div><div class="s" id="mileFuneral">Jul 2031 · on the frozen plan.</div></div></div>
+      <div class="mile"><span class="mk far">·</span><div><div class="t">Debt-free</div><div class="s">The destination. Everything above is just the road there.</div></div></div>
+    </section>
+  </main>
+
+  <!-- ============ PAGE: COACHING ============ -->
+  <main class="page" id="page-coaching">
+    <div class="pagehead">
+      <h1>Coaching</h1>
+      <p>Your monthly review, the lessons your numbers call for, and straight answers.</p>
+    </div>
+
+    <section class="card review">
+      <h2>Coach's review — November</h2>
+      <p><b>What's on course:</b> every bill before your next payday is covered in full, and your spending money is already fenced off. The system works when you don't have to think about it.</p>
+      <p><b>What to watch:</b> five subscriptions are quietly taking <b>$94.45 a month — $1,133 a year</b>. None of them is a disaster. Together they're a car payment. Your call which ones earn their seat.</p>
+      <p id="reviewPlan"><b>The adjustment:</b> Card 1 stays frozen at $150. Left on minimums, that card costs you $8,887 in interest and isn't gone until 2046. Frozen, it's gone by July 2031 and you keep $5,565. Same $150 — different decade.</p>
+      <p class="sig">— Your Ore &amp; Tide coach · Reviews are generated from your numbers. The map follows your spending, not the tap.</p>
+    </section>
+
+    <section class="card">
+      <h2>Lessons on your route</h2>
+      <p class="sub">Short lessons, surfaced because your numbers asked for them.</p>
+      <div class="lesson">
+        <div class="tag">TRAIL MARKER · DEBT</div>
+        <h3>The Freeze</h3>
+        <p>A minimum payment is designed to shrink — so the debt lingers and the interest piles up. Freeze the payment at today's amount and the same dollars finish years sooner. Nothing about your budget changes; only the ending does.</p>
+        <p class="applies">Applies to you: Card 1 — worth $5,565 and fourteen years.</p>
+      </div>
+      <div class="lesson">
+        <div class="tag">TRAIL MARKER · SPENDING</div>
+        <h3>The Quiet Subscriptions</h3>
+        <p>No single subscription feels like real money. Add them up once a year, though, and they read like a bill you never agreed to. Keep the ones you'd re-buy today at full price. Let the rest go.</p>
+        <p class="applies">Applies to you: 5 subscriptions · $94.45 a month · $1,133 a year.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Ask the coach</h2>
+      <p class="sub">Straight answers, no jargon.</p>
+      <div class="qa">
+        <button>What exactly is “safe to spend”?<span class="chev">+</span></button>
+        <div class="ans">What's left of your paycheck after the bills stretch and the future stretch are filled, divided by the days until your next payday. If you stay under that daily number, the bills are never your problem — they're already paid for.</div>
+      </div>
+      <div class="qa">
+        <button>Why does Card 1 get the extra money?<span class="chev">+</span></button>
+        <div class="ans">Because at 24% APR it's your most expensive debt — $100 a month in interest before you've bought a thing. Every extra dollar aimed there removes the most interest. Card 2 is smaller and cheaper, so it waits its turn.</div>
+      </div>
+      <div class="qa">
+        <button>What if a month goes sideways?<span class="chev">+</span></button>
+        <div class="ans">Then the plan reroutes — it doesn't collapse. Update your numbers, and your split, your dates, and this review recalculate around real life. A detour is not a dead end.</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ PAGE: ABOUT ============ -->
+  <main class="page" id="page-about">
+    <div class="pagehead">
+      <h1>About Ore &amp; Tide</h1>
+      <p>What this is, and what it isn't.</p>
+    </div>
+    <section class="card about">
+      <p class="brandline">Ore is the value waiting to be uncovered. Tide is the rhythm of life's financial journey. Build lasting wealth, every season of life.</p>
+      <p>Ore &amp; Tide is a virtual coaching service built on a simple idea: most money trouble isn't a math problem, it's a system problem. So we built the system — a dashboard that takes your income, bills, debts and goals, and turns them into one clear decision every payday: what goes to bills, what's safe to spend, and what builds your future.</p>
+      <div class="steps">
+        <div class="st"><div class="n">1</div><div class="t">Tell it your numbers</div><div class="s">Income, bills, debts, goals — typed by you. No bank login, ever.</div></div>
+        <div class="st"><div class="n">2</div><div class="t">Get your split</div><div class="s">Every payday, your money gets its route: bills covered, spending fenced, future funded.</div></div>
+        <div class="st"><div class="n">3</div><div class="t">Stay on course</div><div class="s">A monthly coach's review reads your numbers and names the one adjustment that matters.</div></div>
+      </div>
+      <p style="font-size:12.5px; color:var(--muted);">Ore &amp; Tide provides financial coaching and education. It is not financial, investment, tax, or legal advice, and it never moves your money — you stay in control of every dollar. Membership opens soon.</p>
+    </section>
+  </main>
+
+  <footer>
+    <img src="data:image/png;base64,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" alt=""><br>
+    Ore &amp; Tide · Educational content, not financial advice.<br>
+    Prototype with a sample member — no real accounts, no real money.
+  </footer>
+</div>
+
+<script>
+  const c = x => Math.round(x * 100) / 100;
+  function amortize(balance, aprPct, mode, fixedPay){
+    const r = aprPct / 100 / 12; let months = 0, totalInt = 0, bal = balance;
+    while (bal > 0.004 && months < 1200){
+      const interest = c(bal * r); totalInt = c(totalInt + interest);
+      let pay = (mode === 'minimum') ? c(Math.max(25, interest + bal * 0.01)) : fixedPay;
+      pay = Math.min(pay, c(bal + interest)); bal = c(bal + interest - pay); months++;
+    }
+    return { months, totalInt };
+  }
+  function monthLabel(startYear, startMonthIdx, addMonths){
+    const d = new Date(startYear, startMonthIdx + addMonths, 1);
+    return d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+  }
+  const money = n => '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+  // Page switching
+  function showPage(name){
+    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
+    document.querySelectorAll('.navlink').forEach(n => n.classList.toggle('active', n.dataset.page === name));
+    if (location.hash !== '#' + name) history.replaceState(null, '', '#' + name);
+    window.scrollTo({ top: 0 });
+  }
+  document.querySelectorAll('.navlink').forEach(n => n.addEventListener('click', () => showPage(n.dataset.page)));
+  document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showPage(b.dataset.goto)));
+  if (['plan','coaching','about'].includes(location.hash.slice(1))) showPage(location.hash.slice(1));
+
+  // Sample member data (Seth) — day = days after payday (Nov 20)
+  const PAYCHECK = 1920, CYCLE_DAYS = 14;
+  const bills = [
+    { name: 'Rent (your share)', due: 'Dec 1', day: 11, amt: 725 },
+    { name: 'Electric', due: 'Nov 25', day: 5, amt: 86 },
+    { name: 'Phone', due: 'Nov 28', day: 8, amt: 65 },
+    { name: 'Car insurance', due: 'Nov 30', day: 10, amt: 142 },
+    { name: 'Card 1 payment', due: 'Nov 26', day: 6, amt: 150 },
+    { name: 'Card 2 payment', due: 'Nov 27', day: 7, amt: 25 }
+  ];
+  const subs = [
+    { name: 'Streamly', due: 'Nov 22', day: 2, amt: 15.49 },
+    { name: 'Music app', due: 'Nov 29', day: 9, amt: 11.99 },
+    { name: 'Cloud storage', due: 'Dec 2', day: 12, amt: 9.99 },
+    { name: 'Gym', due: 'Dec 8', day: 18, amt: 39.99 },
+    { name: 'Game pass', due: 'Dec 10', day: 20, amt: 16.99 }
+  ];
+  const subsThisCycle = subs.filter(s => s.day <= 13);
+  const billsTotal = bills.reduce((a,b) => a + b.amt, 0) + subsThisCycle.reduce((a,b) => a + b.amt, 0);
+  const POOL = c(PAYCHECK - billsTotal);
+  let futureAmt = 110;
+
+  // Paycheck splitter v14 — back to the SIMPLE flow at Joshua's word (Nov 18, 2026):
+  // one source node, three lines flowing down to three bucket cards. Executed strictly
+  // in the palette from his brand sheet: Deep Navy #0F2D4A (source + text), Ocean Blue
+  // #1E5D7A (Bills), Coastal Teal #3E8CA7 (Spend), Sand Gold #D4AF7A (Future + accents),
+  // Mist Blue #E6F1F6 (panel + tracks), Stone #F5F7F9 (cards), Slate #64748B (secondary).
+  // One SVG coordinate system, so it scales as a unit at any width. Line thickness and
+  // each card's share bar track the amounts live.
+  function renderFlow(){
+    const spendAmt = c(POOL - futureAmt);
+    const C = { navy: '#0F2D4A', ocean: '#1E5D7A', teal: '#3E8CA7', gold: '#D4AF7A', mist: '#E6F1F6', stone: '#F5F7F9', slate: '#64748B' };
+    const flowW = amt => Math.max(5, Math.round(5 + (amt / PAYCHECK) * 20));
+    const pct = amt => Math.round(amt / PAYCHECK * 100);
+    const flow = (x, amt, col) => `<path d="M450,142 C 450,218 ${x},218 ${x},296" fill="none" stroke="${col}" stroke-width="${flowW(amt)}" stroke-linecap="round" opacity="0.9"/>`;
+    const node = (left, amt, name, col, id) => `
+      <g transform="translate(${left},298)">
+        <rect width="270" height="152" rx="16" fill="${C.stone}" stroke="#C9D6DF" stroke-width="1.2"/>
+        <path d="M0,16 a16,16 0 0 1 16,-16 h238 a16,16 0 0 1 16,16 v4 H0 z" fill="${col}"/>
+        <text x="135" y="60" text-anchor="middle" font-family="Lora,Georgia,serif" font-size="26" font-weight="600" fill="${C.navy}">${name}</text>
+        <text id="${id}" x="135" y="102" text-anchor="middle" font-family="Inter,sans-serif" font-size="33" font-weight="800" fill="${C.navy}">${money(amt)}</text>
+        <text x="135" y="126" text-anchor="middle" font-family="Inter,sans-serif" font-size="15" fill="${C.slate}">${pct(amt)}% of paycheck</text>
+        <rect x="35" y="136" width="200" height="8" rx="4" fill="${C.mist}"/>
+        <rect x="35" y="136" width="${Math.round(amt / PAYCHECK * 200)}" height="8" rx="4" fill="${col}"/>
+      </g>`;
+
+    document.getElementById('flowArt').innerHTML = `
+      <svg viewBox="0 0 900 480" role="img" aria-label="Your paycheck flowing into Spend, Bills, and Future">
+        ${flow(150, spendAmt, C.teal)}${flow(450, billsTotal, C.ocean)}${flow(750, futureAmt, C.gold)}
+        ${node(15, spendAmt, 'Spend', C.teal, 'chipSpend')}
+        ${node(315, billsTotal, 'Bills', C.ocean, 'chipBills')}
+        ${node(615, futureAmt, 'Future', C.gold, 'chipFuture')}
+        <g>
+          <rect x="300" y="26" width="300" height="116" rx="18" fill="${C.navy}"/>
+          <text x="450" y="112" text-anchor="middle" font-family="Lora,Georgia,serif" font-size="27" font-weight="600" fill="#FFFFFF">Paycheck</text>
+          <text id="chipIncome" x="450" y="136" text-anchor="middle" font-family="Inter,sans-serif" font-size="22" font-weight="700" fill="${C.gold}">${money(PAYCHECK)}</text>
+        </g>
+      </svg>`;
+    document.getElementById('chipBills').textContent = money(billsTotal);
+    document.getElementById('chipSpend').textContent = money(spendAmt);
+    document.getElementById('chipFuture').textContent = money(futureAmt);
+    document.getElementById('chipIncome').textContent = money(PAYCHECK);
+    document.getElementById('spendVal').textContent = money(spendAmt);
+    document.getElementById('futVal').textContent = money(futureAmt);
+    document.getElementById('spendPct').textContent = Math.round(spendAmt / PAYCHECK * 100) + '% of income';
+    document.getElementById('futPct').textContent = Math.round(futureAmt / PAYCHECK * 100) + '% of income';
+    document.getElementById('splitWhy').innerHTML =
+      `Bills are fixed — every stop before Dec 4, held at full value. The slider is yours: slide toward Future and watch your daily number move. Safe to spend right now: <b>${money(Math.floor(spendAmt / CYCLE_DAYS))} a day</b> until Dec 4.`;
+    document.getElementById('statSafe').textContent = money(Math.floor(spendAmt / CYCLE_DAYS)) + '/day';
+    const slider = document.getElementById('splitSlider');
+    const p = Math.round(futureAmt / POOL * 100);
+    slider.style.background = `linear-gradient(90deg, #3E8CA7 0%, #3E8CA7 ${100 - p}%, #D4AF7A ${100 - p}%, #D4AF7A 100%)`;
+  }
+  renderFlow();
+  document.getElementById('splitSlider').addEventListener('input', function(){
+    futureAmt = +this.value; renderFlow();
+  });
+
+  // Planned stops list (Plan page)
+  const stopsEl = document.getElementById('stops');
+  stopsEl.innerHTML = bills.concat(subsThisCycle).slice().sort((a,b) => a.day - b.day).map(s =>
+    `<div class="stop"><span>${s.name} <span class="d">· ${s.due}</span></span><span>${money(s.amt)}</span></div>`).join('');
+  const subsMonthly = subs.reduce((a,b) => a + b.amt, 0);
+  document.getElementById('leakLine').innerHTML =
+    `Across the month you carry <b>${subs.length} subscriptions — $${subsMonthly.toFixed(2)} a month, ${money(subsMonthly * 12)} a year</b>. They ride the route as planned stops, so they never ambush the split.`;
+
+  // Card engines + freeze toggle
+  const minOnly = amortize(5000, 24, 'minimum');
+  const frozen  = amortize(5000, 24, 'fixed', 150);
+  const saved   = c(minOnly.totalInt - frozen.totalInt);
+  const card2   = amortize(359, 24.99, 'fixed', 25);
+  document.getElementById('card2Date').textContent = monthLabel(2026, 11, card2.months - 1);
+
+  const reviewFrozen = `<b>The adjustment:</b> Card 1 stays frozen at $150. Left on minimums, that card costs you ${money(minOnly.totalInt)} in interest and isn't gone until ${monthLabel(2026, 11, minOnly.months - 1)}. Frozen, it's gone by ${monthLabel(2026, 11, frozen.months - 1)} and you keep ${money(saved)}. Same $150 — different decade.`;
+  const reviewMinimum = `<b>The adjustment:</b> right now Card 1 is on minimums — the long way round. Freezing it at $150 moves the finish from ${monthLabel(2026, 11, minOnly.months - 1)} to ${monthLabel(2026, 11, frozen.months - 1)} and keeps ${money(saved)} in your pocket. It's the One Next Move, on your dashboard.`;
+
+  let freezeOn = true;
+  function renderPlan(){
+    const dest = monthLabel(2026, 11, (freezeOn ? frozen.months : minOnly.months) - 1);
+    const interest = freezeOn ? frozen.totalInt : minOnly.totalInt;
+    document.getElementById('jDest').textContent = dest;
+    document.getElementById('jSaved').textContent = freezeOn ? money(saved) : '$0';
+    document.getElementById('impDate').textContent = dest;
+    document.getElementById('impInt').textContent = money(interest);
+    document.getElementById('impSave').textContent = freezeOn ? money(saved) : '$0';
+    document.getElementById('card1Date').textContent = dest;
+    document.getElementById('statFuneral').textContent = dest;
+    document.getElementById('mileFuneral').textContent = dest + (freezeOn ? ' · on the frozen plan.' : ' · on minimums — freeze it to pull this in.');
+    document.getElementById('card1Pay').textContent = freezeOn ? '$150/mo, frozen' : 'minimum only — it shrinks every month';
+    const pill = document.getElementById('card1Pill');
+    pill.textContent = freezeOn ? 'ON PLAN' : 'OFF PLAN';
+    pill.className = 'pill ' + (freezeOn ? 'plan' : 'warn');
+    document.getElementById('reviewPlan').innerHTML = freezeOn ? reviewFrozen : reviewMinimum;
+  }
+  renderPlan();
+
+  document.getElementById('freezeToggle').addEventListener('click', function(){
+    freezeOn = !freezeOn; this.classList.toggle('on', freezeOn); renderPlan();
+  });
+
+  document.getElementById('checkinBtn').addEventListener('click', function(){
+    const box = document.getElementById('checkin'); box.classList.add('open');
+    const steps = box.querySelectorAll('[data-step]');
+    steps.forEach((s, i) => setTimeout(() => { s.classList.add('done'); s.querySelector('.dot').textContent = '✓'; }, 450 * (i + 1)));
+    this.textContent = 'Check-in complete — see you Dec 4'; this.disabled = true; this.style.opacity = '.75';
+  });
+
+  document.querySelectorAll('.qa button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qa = btn.parentElement, open = qa.classList.toggle('open');
+      btn.querySelector('.chev').textContent = open ? '–' : '+';
+    });
+  });
+</script>
+</body>
+</html>
