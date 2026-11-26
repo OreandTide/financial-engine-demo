@@ -1,7 +1,7 @@
 {
  "version": 1,
- "generated": "2026-11-25",
- "note": "Per-state packaging v1 (Joshua's ruling, Nov 25, 2026). National shards for the 26 live states are untouched. A state package carries the state's water, rivers and roads, sliced verbatim from the gated packaged shards by representative point in the state's pipeline bbox; the shared regional land ring + boundaries stay in the base package and change only when the region box changes. Places ride the basemap bins. Production refinement: attribute by state-boundary polygon instead of bbox.",
+ "generated": "2026-11-26",
+ "note": "Per-state packaging v1 (Joshua's ruling, Nov 25, 2026). National shards for the 27 live states are untouched. A state package carries the state's water, rivers and roads, sliced verbatim from the gated packaged shards by representative point in the state's pipeline bbox; the shared regional land ring + boundaries stay in the base package and change only when the region box changes. Places ride the basemap bins. Production refinement: attribute by state-boundary polygon instead of bbox.",
  "base": {
   "files": [
    {
@@ -21,13 +21,13 @@
    },
    {
     "path": "proof-slice-geo-c.json",
-    "bytes": 5163453,
-    "md5": "5c1970de3494280c41f28dd89e45bc0d"
+    "bytes": 5051834,
+    "md5": "2e3037c158d3875c5ce113819c1b830a"
    },
    {
     "path": "proof-slice-geo-c2.json",
-    "bytes": 2534342,
-    "md5": "acc39ec194e03f9c103dbabc5259d487"
+    "bytes": 2653596,
+    "md5": "98896b721df8440ab5bbdaed18875403"
    }
   ]
  },
@@ -71,6 +71,51 @@
      "path": "mn/mn-roads-3.json",
      "bytes": 227397,
      "md5": "af7062177bc6ea022e7f7f619a1a3783",
+     "collections": {
+      "roadsW3": 2
+     }
+    }
+   ]
+  },
+  {
+   "code": "ia",
+   "name": "Iowa",
+   "bbox": [
+    -96.76,
+    40.25,
+    -90.02,
+    43.62
+   ],
+   "files": [
+    {
+     "path": "ia/ia-water.json",
+     "bytes": 816350,
+     "md5": "6cde6f8b97736b40f6fa8726738b04fe",
+     "collections": {
+      "water": 33,
+      "rivers": 1689
+     }
+    },
+    {
+     "path": "ia/ia-roads-1.json",
+     "bytes": 222295,
+     "md5": "690dd6fb24c268fcf822d750b1f92647",
+     "collections": {
+      "roadsW1": 2
+     }
+    },
+    {
+     "path": "ia/ia-roads-2.json",
+     "bytes": 256968,
+     "md5": "699756fef29156752e2a10e58c8ef531",
+     "collections": {
+      "roadsW2": 2
+     }
+    },
+    {
+     "path": "ia/ia-roads-3.json",
+     "bytes": 222470,
+     "md5": "060283591bb8b7d61f9ea08e5acec536",
      "collections": {
       "roadsW3": 2
      }
