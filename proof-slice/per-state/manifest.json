@@ -1,7 +1,7 @@
 {
  "version": 1,
- "generated": "2026-11-26",
- "note": "Per-state packaging v1 (Joshua's ruling, Nov 25, 2026). National shards for the 27 live states are untouched. A state package carries the state's water, rivers and roads, sliced verbatim from the gated packaged shards by representative point in the state's pipeline bbox; the shared regional land ring + boundaries stay in the base package and change only when the region box changes. Places ride the basemap bins. Production refinement: attribute by state-boundary polygon instead of bbox.",
+ "generated": "2026-11-27",
+ "note": "Per-state packaging v1 (Joshua's ruling, Nov 25, 2026). National shards for the 28 live states are untouched. A state package carries the state's water, rivers and roads, sliced verbatim from the gated packaged shards by representative point in the state's pipeline bbox; the shared regional land ring + boundaries stay in the base package and change only when the region box changes. Places ride the basemap bins. Production refinement: attribute by state-boundary polygon instead of bbox.",
  "base": {
   "files": [
    {
@@ -21,13 +21,13 @@
    },
    {
     "path": "proof-slice-geo-c.json",
-    "bytes": 5051834,
-    "md5": "2e3037c158d3875c5ce113819c1b830a"
+    "bytes": 5174289,
+    "md5": "fab1e6a6a208653c4e825c5a58396ae1"
    },
    {
     "path": "proof-slice-geo-c2.json",
-    "bytes": 2653596,
-    "md5": "98896b721df8440ab5bbdaed18875403"
+    "bytes": 2690753,
+    "md5": "e0008e33f7d0240d58efd6dc82b07528"
    }
   ]
  },
@@ -44,8 +44,8 @@
    "files": [
     {
      "path": "mn/mn-water.json",
-     "bytes": 1733050,
-     "md5": "18ccb8f74c1f6889c88080b8ac66fb69",
+     "bytes": 3294828,
+     "md5": "c209bb62f5ac4048821e7cf6525104f9",
      "collections": {
       "water": 263,
       "rivers": 4979
@@ -118,6 +118,51 @@
      "md5": "060283591bb8b7d61f9ea08e5acec536",
      "collections": {
       "roadsW3": 2
+     }
+    }
+   ]
+  },
+  {
+   "code": "nd",
+   "name": "North Dakota",
+   "bbox": [
+    -105.2,
+    45.82,
+    -96.44,
+    49.46
+   ],
+   "files": [
+    {
+     "path": "nd/nd-water.json",
+     "bytes": 570824,
+     "md5": "ae4eec68d7b18111f9ce314c67947ef6",
+     "collections": {
+      "water": 32,
+      "rivers": 1437
+     }
+    },
+    {
+     "path": "nd/nd-roads-1.json",
+     "bytes": 117867,
+     "md5": "fc7288136dcc23a8d7a6cf02e322fcd6",
+     "collections": {
+      "roadsW1": 2
+     }
+    },
+    {
+     "path": "nd/nd-roads-2.json",
+     "bytes": 78320,
+     "md5": "90f2439974f186bebb360770c2697429",
+     "collections": {
+      "roadsW2": 2
+     }
+    },
+    {
+     "path": "nd/nd-roads-3.json",
+     "bytes": 38196,
+     "md5": "be3d50e0ad0d4b7b586d074b0a69a6e3",
+     "collections": {
+      "roadsW3": 1
      }
     }
    ]
