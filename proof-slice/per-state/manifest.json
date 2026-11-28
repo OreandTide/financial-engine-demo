@@ -1,7 +1,7 @@
 {
  "version": 1,
- "generated": "2026-11-27",
- "note": "Per-state packaging v1 (Joshua's ruling, Nov 25, 2026). National shards for the 28 live states are untouched. A state package carries the state's water, rivers and roads, sliced verbatim from the gated packaged shards by representative point in the state's pipeline bbox; the shared regional land ring + boundaries stay in the base package and change only when the region box changes. Places ride the basemap bins. Production refinement: attribute by state-boundary polygon instead of bbox.",
+ "generated": "2026-11-28",
+ "note": "Per-state packaging v1 (Joshua's ruling, Nov 25, 2026). National shards for the 29 live states are untouched. A state package carries the state's water, rivers and roads, sliced verbatim from the gated packaged shards by representative point in the state's pipeline bbox; the shared regional land ring + boundaries stay in the base package and change only when the region box changes. Places ride the basemap bins. Production refinement: attribute by state-boundary polygon instead of bbox.",
  "base": {
   "files": [
    {
@@ -21,13 +21,13 @@
    },
    {
     "path": "proof-slice-geo-c.json",
-    "bytes": 5174289,
-    "md5": "fab1e6a6a208653c4e825c5a58396ae1"
+    "bytes": 5265863,
+    "md5": "626d4804614b72718438033c0c0dbda1"
    },
    {
     "path": "proof-slice-geo-c2.json",
-    "bytes": 2690753,
-    "md5": "e0008e33f7d0240d58efd6dc82b07528"
+    "bytes": 2734114,
+    "md5": "9c56155c14489e312c0a0fb25ad8085d"
    }
   ]
  },
@@ -161,6 +161,51 @@
      "path": "nd/nd-roads-3.json",
      "bytes": 38196,
      "md5": "be3d50e0ad0d4b7b586d074b0a69a6e3",
+     "collections": {
+      "roadsW3": 1
+     }
+    }
+   ]
+  },
+  {
+   "code": "sd",
+   "name": "South Dakota",
+   "bbox": [
+    -105.03,
+    42.36,
+    -96.32,
+    46.06
+   ],
+   "files": [
+    {
+     "path": "sd/sd-water.json",
+     "bytes": 374414,
+     "md5": "353a11222195711f89a6683ffd2ff5fc",
+     "collections": {
+      "water": 37,
+      "rivers": 692
+     }
+    },
+    {
+     "path": "sd/sd-roads-1.json",
+     "bytes": 122166,
+     "md5": "405a1d425509a48a47b10d59081b7aa3",
+     "collections": {
+      "roadsW1": 2
+     }
+    },
+    {
+     "path": "sd/sd-roads-2.json",
+     "bytes": 95845,
+     "md5": "48c873b8c106c5db5fdfaac4559fe4a7",
+     "collections": {
+      "roadsW2": 2
+     }
+    },
+    {
+     "path": "sd/sd-roads-3.json",
+     "bytes": 58467,
+     "md5": "4f6209706c884532de333164ddc7d4ef",
      "collections": {
       "roadsW3": 1
      }
